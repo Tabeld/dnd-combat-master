@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>D&D 5e Мастер боя</title>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1><i class="fas fa-dragon"></i> D&D 5e Мастер боя</h1>
+                <p>Полный трекер боя для мастера</p>
+            </header>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="battle">
+                    <i class="fas fa-swords"></i> Бой
+                </div>
+                <div class="tab" data-tab="bestiary">
+                    <i class="fas fa-book"></i> Бестиарий
+                </div>
+                <div class="tab" data-tab="roller">
+                    <i class="fas fa-dice"></i> Кубы
+                </div>
+                <div class="tab" data-tab="session">
+                    <i class="fas fa-save"></i> Данные
+                </div>
+            </div>
+            
+            <!-- Боевой трекер -->
+            <div id="battle" class="tab-content active">
+                <div class="battle-header">
+                    <div class="round-info">
+                        <h2><i class="fas fa-history"></i> Раунд: <span class="round-number" id="round-count">1</span></h2>
+                        <div class="initiative-controls">
+                            <button onclick="nextTurn()" class="btn btn-primary">
+                                <i class="fas fa-forward"></i> Следующий
+                            </button>
+                            <button onclick="previousTurn()" class="btn btn-warning">
+                                <i class="fas fa-backward"></i> Предыдущий
+                            </button>
+                            <button onclick="newRound()" class="btn btn-success">
+                                <i class="fas fa-redo"></i> Новый раунд
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="current-turn">
+                        <div class="turn-indicator">
+                            <i class="fas fa-user"></i> Текущий ход: <strong id="current-turn-name">-</strong>
+                        </div>
+                        <div class="quick-actions">
+                            <button onclick="showAddToBattleModal()" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Добавить существо
+                            </button>
+                            <button onclick="showQuickNPCModal()" class="btn btn-success">
+                                <i class="fas fa-bolt"></i> Быстрый NPC
+                            </button>
+                            <button onclick="showCreateGroupModal()" class="btn btn-info">
+                                <i class="fas fa-users"></i> Создать группу
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="battle-content">
+                    <!-- Инициатива -->
+                    <div class="initiative-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-list-ol"></i> Инициатива</h3>
+                                <div style="display: flex; gap: 10px;">
+                                    <button onclick="rollAllInitiative()" class="btn btn-sm">
+                                        <i class="fas fa-dice"></i> Бросить всем
+                                    </button>
+                                    <button onclick="sortInitiative()" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-sort-numeric-down-alt"></i> Сортировать
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content initiative-tracker">
+                                <div class="drop-zone" id="ungroup-drop-zone" 
+                                     ondragover="handleDragOver(event)" 
+                                     ondrop="handleDropToUngroup(event)">
+                                    Перетащите сюда, чтобы вывести из группы
+                                </div>
+                                <div id="initiative-list" class="initiative-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- История боя -->
+                    <div class="log-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-scroll"></i> История боя</h3>
+                                <button onclick="clearBattleLog()" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i> Очистить
+                                </button>
+                            </div>
+                            <div class="card-content log" id="battle-log"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Управление существом -->
+                    <div class="creature-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-user-edit"></i> Управление существом</h3>
+                            </div>
+                            <div class="card-content creature-details" id="creature-details">
+                                <div class="empty-state">Выберите существо для управления</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Бестиарий -->
+            <div id="bestiary" class="tab-content">
+                <div class="other-tab-content">
+                    <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- Форма создания/редактирования существа -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-plus-circle"></i> 
+                                    <span id="form-title">Создать существо</span>
+                                </h3>
+                                <div id="edit-controls" style="display: none;">
+                                    <button onclick="cancelEdit()" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-times"></i> Отмена
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div id="creature-form">
+                                    <input type="hidden" id="cr-id" value="">
+                                    <div class="form-group">
+                                        <label><i class="fas fa-tag"></i> Имя:</label>
+                                        <input type="text" id="cr-name" placeholder="Древний Красный Дракон" class="form-control">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Макс. HP:</label>
+                                            <input type="number" id="cr-max-hp" value="100" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>КД:</label>
+                                            <input type="number" id="cr-ac" value="18" class="form-control">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Бонус к инициативе:</label>
+                                            <input type="number" id="cr-init-bonus" value="0" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Бонус к атаке:</label>
+                                            <input type="number" id="cr-attack-bonus" value="10" class="form-control">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Урон (например: 2d6+3):</label>
+                                            <input type="text" id="cr-damage" placeholder="2d6+3" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Тип урона:</label>
+                                            <select id="cr-damage-type" class="form-control">
+                                                <option value="slashing">Рубящий</option>
+                                                <option value="piercing">Колющий</option>
+                                                <option value="bludgeoning">Дробящий</option>
+                                                <option value="fire">Огонь</option>
+                                                <option value="cold">Холод</option>
+                                                <option value="acid">Кислота</option>
+                                                <option value="lightning">Электричество</option>
+                                                <option value="poison">Яд</option>
+                                                <option value="radiant">Свет</option>
+                                                <option value="necrotic">Некротический</option>
+                                                <option value="psychic">Психический</option>
+                                                <option value="force">Силовой</option>
+                                                <option value="thunder">Звук</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Резисты/Иммунитеты/Уязвимости -->
+                                    <div class="form-group">
+                                        <label><i class="fas fa-shield-alt"></i> Сопротивления (через запятую):</label>
+                                        <input type="text" id="cr-resistances" placeholder="огонь, холод" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fas fa-ban"></i> Иммунитеты (через запятую):</label>
+                                        <input type="text" id="cr-immunities" placeholder="яд, оглушение" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fas fa-skull-crossbones"></i> Уязвимости (через запятую):</label>
+                                        <input type="text" id="cr-vulnerabilities" placeholder="силовой" class="form-control">
+                                    </div>
+                                    
+                                    <!-- Мультиатака -->
+                                    <div class="form-group">
+                                        <label><i class="fas fa-fist-raised"></i> Мультиатака:</label>
+                                        <input type="text" id="cr-multiattack" placeholder="Коготь, Коготь, Укус" class="form-control">
+                                    </div>
+                                    
+                                    <!-- Легендарные действия -->
+                                    <div class="form-group">
+                                        <label><i class="fas fa-crown"></i> Легендарные действия (через | ):</label>
+                                        <textarea id="cr-legendary-actions" placeholder="Атака хвостом|Крылья|Огненное дыхание" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <!-- Действия логова -->
+                                    <div class="form-group">
+                                        <label><i class="fas fa-mountain"></i> Действия логова (через | ):</label>
+                                        <textarea id="cr-lair-actions" placeholder="Землетрясение|Призыв лавы|Туманы" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <!-- Цвет существа -->
+                                    <div class="form-group">
+                                        <label><i class="fas fa-palette"></i> Цвет существа:</label>
+                                        <div class="color-picker">
+                                            <div class="color-option selected" style="background: #3498db;" data-color="#3498db"></div>
+                                            <div class="color-option" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                                            <div class="color-option" style="background: #2ecc71;" data-color="#2ecc71"></div>
+                                            <div class="color-option" style="background: #f39c12;" data-color="#f39c12"></div>
+                                            <div class="color-option" style="background: #9b59b6;" data-color="#9b59b6"></div>
+                                            <div class="color-option" style="background: #1abc9c;" data-color="#1abc9c"></div>
+                                            <div class="color-option" style="background: #e67e22;" data-color="#e67e22"></div>
+                                            <div class="color-option" style="background: #34495e;" data-color="#34495e"></div>
+                                            <div class="color-option" style="background: #d35400;" data-color="#d35400"></div>
+                                            <div class="color-option" style="background: #c0392b;" data-color="#c0392b"></div>
+                                        </div>
+                                        <input type="hidden" id="cr-color" value="#3498db">
+                                    </div>
+                                    
+                                    <button onclick="saveCreature()" class="btn btn-success" style="width: 100%;">
+                                        <i class="fas fa-save"></i> <span id="save-button-text">Сохранить существо</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Сохранённые существа -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-book-open"></i> Сохранённые существа</h3>
+                                <div style="width: 200px;">
+                                    <input type="text" id="creature-search" placeholder="Поиск..." class="form-control" style="padding: 6px 12px;">
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div id="saved-creatures" class="creatures-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Броски кубов -->
+            <div id="roller" class="tab-content">
+                <div class="other-tab-content">
+                    <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-dice-d20"></i> Бросок кубов</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="dice-roller">
+                                    <button onclick="rollDice('d4')" class="dice-btn"><i class="fas fa-dice-d4"></i> d4</button>
+                                    <button onclick="rollDice('d6')" class="dice-btn"><i class="fas fa-dice-d6"></i> d6</button>
+                                    <button onclick="rollDice('d8')" class="dice-btn"><i class="fas fa-dice-d8"></i> d8</button>
+                                    <button onclick="rollDice('d10')" class="dice-btn"><i class="fas fa-dice-d10"></i> d10</button>
+                                    <button onclick="rollDice('d12')" class="dice-btn"><i class="fas fa-dice-d12"></i> d12</button>
+                                    <button onclick="rollDice('d20')" class="dice-btn"><i class="fas fa-dice-d20"></i> d20</button>
+                                    <button onclick="rollDice('d100')" class="dice-btn"><i class="fas fa-dice"></i> d100</button>
+                                    <button onclick="rollAdvantage()" class="dice-btn"><i class="fas fa-angle-double-up"></i> Преимущество</button>
+                                    <button onclick="rollDisadvantage()" class="dice-btn"><i class="fas fa-angle-double-down"></i> Помеха</button>
+                                </div>
+                                
+                                <div class="form-group" style="margin-top: 20px;">
+                                    <label>Произвольный бросок:</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" id="custom-roll" placeholder="2d6+3" class="form-control">
+                                        <button onclick="rollCustom()" class="btn btn-primary">
+                                            <i class="fas fa-dice"></i> Бросить
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="roll-result" id="roll-result"></div>
+                                
+                                <div class="form-group" style="margin-top: 20px;">
+                                    <label>Массовые броски (например: 8d6):</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" id="mass-roll" placeholder="8d6" class="form-control">
+                                        <button onclick="rollMass()" class="btn btn-warning">
+                                            <i class="fas fa-dice"></i> Массовый бросок
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-crosshairs"></i> Контекстный бросок</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="form-group">
+                                    <label>Существо:</label>
+                                    <select id="context-creature" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Тип броска:</label>
+                                    <select id="context-roll-type" class="form-control">
+                                        <option value="attack">Атака</option>
+                                        <option value="save">Спасбросок</option>
+                                        <option value="skill">Проверка навыка</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Навык/Спасбросок:</label>
+                                    <select id="context-skill" class="form-control">
+                                        <option value="strength">Сила</option>
+                                        <option value="dexterity">Ловкость</option>
+                                        <option value="constitution">Телосложение</option>
+                                        <option value="intelligence">Интеллект</option>
+                                        <option value="wisdom">Мудрость</option>
+                                        <option value="charisma">Харизма</option>
+                                    </select>
+                                </div>
+                                <button onclick="contextRoll()" class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-dice-d20"></i> Бросить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Управление сессией -->
+            <div id="session" class="tab-content">
+                <div class="other-tab-content">
+                    <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-database"></i> Управление данными</h3>
+                            </div>
+                            <div class="card-content">
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button onclick="saveSession()" class="btn btn-success">
+                                        <i class="fas fa-download"></i> Экспорт сессии
+                                    </button>
+                                    <button onclick="loadSession()" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> Импорт сессии
+                                    </button>
+                                    <button onclick="backupData()" class="btn btn-warning">
+                                        <i class="fas fa-file-export"></i> Резервная копия
+                                    </button>
+                                    <button onclick="clearSession()" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Очистить всё
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-bar"></i> Статистика боя</h3>
+                            </div>
+                            <div class="card-content">
+                                <div id="battle-stats"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальные окна -->
+        <div id="damage-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-heart-broken"></i> Нанесение урона/лечения</h3>
+                <div class="form-group">
+                    <label>Количество (отрицательное для урона):</label>
+                    <input type="number" id="damage-amount" placeholder="-10" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Тип урона:</label>
+                    <select id="damage-type" class="form-control">
+                        <option value="slashing">Рубящий</option>
+                        <option value="piercing">Колющий</option>
+                        <option value="bludgeoning">Дробящий</option>
+                        <option value="fire">Огонь</option>
+                        <option value="cold">Холод</option>
+                        <option value="acid">Кислота</option>
+                        <option value="lightning">Электричество</option>
+                        <option value="poison">Яд</option>
+                        <option value="radiant">Свет</option>
+                        <option value="necrotic">Некротический</option>
+                        <option value="psychic">Психический</option>
+                        <option value="force">Силовой</option>
+                        <option value="thunder">Звук</option>
+                        <option value="healing">Лечение</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="applyDamage()" class="btn btn-danger">
+                        <i class="fas fa-bolt"></i> Применить
+                    </button>
+                    <button onclick="closeModal('damage-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="condition-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-exclamation-triangle"></i> Добавить состояние</h3>
+                <select id="condition-select" class="form-control">
+                    <option value="blinded">Ослеплён</option>
+                    <option value="charmed">Очарован</option>
+                    <option value="frightened">Испуган</option>
+                    <option value="grappled">Схвачен</option>
+                    <option value="paralyzed">Парализован</option>
+                    <option value="petrified">Окаменевший</option>
+                    <option value="poisoned">Отравлен</option>
+                    <option value="prone">Лежит</option>
+                    <option value="restrained">Скован</option>
+                    <option value="stunned">Оглушён</option>
+                    <option value="unconscious">Бессознателен</option>
+                    <option value="invisible">Невидим</option>
+                </select>
+                <div class="form-group">
+                    <label>Длительность (ходов):</label>
+                    <input type="number" id="condition-duration" value="1" min="1" class="form-control">
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="addCondition()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Добавить
+                    </button>
+                    <button onclick="closeModal('condition-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="add-to-battle-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-users"></i> Добавить существо в бой</h3>
+                <div id="battle-creatures-list" class="creatures-grid-modal" style="max-height: 400px; overflow-y: auto;"></div>
+                <div class="modal-buttons">
+                    <button onclick="closeModal('add-to-battle-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="quick-npc-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-running"></i> Быстрый NPC</h3>
+                <div class="form-group">
+                    <label>Имя:</label>
+                    <input type="text" id="quick-npc-name" placeholder="Гоблин" class="form-control">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>HP:</label>
+                        <input type="number" id="quick-npc-hp" placeholder="7" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>КД:</label>
+                        <input type="number" id="quick-npc-ac" placeholder="15" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Инициатива (оставьте пустым для автоматического):</label>
+                    <input type="number" id="quick-npc-initiative" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Цвет:</label>
+                    <div class="color-picker">
+                        <div class="color-option selected" style="background: #3498db;" data-color="#3498db"></div>
+                        <div class="color-option" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                        <div class="color-option" style="background: #2ecc71;" data-color="#2ecc71"></div>
+                        <div class="color-option" style="background: #f39c12;" data-color="#f39c12"></div>
+                        <div class="color-option" style="background: #9b59b6;" data-color="#9b59b6"></div>
+                    </div>
+                    <input type="hidden" id="quick-npc-color" value="#3498db">
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="addQuickNPC()" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Добавить в бой
+                    </button>
+                    <button onclick="closeModal('quick-npc-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="initiative-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-list-ol"></i> Изменить инициативу</h3>
+                <div class="form-group">
+                    <label>Инициатива:</label>
+                    <input type="number" id="edit-initiative" class="form-control">
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="saveInitiative()" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button onclick="closeModal('initiative-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- НОВЫЕ МОДАЛЬНЫЕ ОКНА -->
+        
+        <!-- Модальное окно для создания группы -->
+        <div id="create-group-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-users"></i> Создание группы</h3>
+                <div class="form-group">
+                    <label>Название группы:</label>
+                    <input type="text" id="group-name" placeholder="Гоблины" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Количество существ:</label>
+                    <input type="number" id="group-count" value="3" min="1" max="20" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Шаблон существа:</label>
+                    <select id="group-template" class="form-control">
+                        <!-- Заполнится скриптом -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Тип нумерации:</label>
+                    <select id="group-numbering" class="form-control">
+                        <option value="numbers">Номера (Гоблин 1, Гоблин 2)</option>
+                        <option value="letters">Буквы (Гоблин A, Гоблин B)</option>
+                        <option value="roman">Римские (Гоблин I, Гоблин II)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Автоматически задать разные цвета?</label>
+                    <div style="margin-top: 5px;">
+                        <input type="checkbox" id="auto-colors" checked>
+                        <label for="auto-colors" style="display: inline; font-weight: normal;">Да</label>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="createGroupFromModal()" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Создать группу
+                    </button>
+                    <button onclick="closeModal('create-group-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальное окно для временных хитов -->
+        <div id="temp-hp-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-shield-alt"></i> Управление временными хитами</h3>
+                <div class="form-group">
+                    <label>Количество временных хитов:</label>
+                    <input type="number" id="temp-hp-amount" value="5" min="0" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Текущие временные хиты: <span id="current-temp-hp">0</span></label>
+                </div>
+                <div class="form-group">
+                    <label>Что сделать с временными хитами?</label>
+                    <select id="temp-hp-action" class="form-control">
+                        <option value="set">Установить новое значение</option>
+                        <option value="add">Добавить к текущим</option>
+                        <option value="replace">Заменить, если новое значение больше</option>
+                        <option value="remove">Удалить все временные хиты</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="applyTempHP()" class="btn btn-warning">
+                        <i class="fas fa-check"></i> Применить
+                    </button>
+                    <button onclick="closeModal('temp-hp-modal')" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Модальное окно для редактирования существа -->
+        <div id="edit-creature-modal" class="modal">
+            <div class="modal-content">
+                <h3><i class="fas fa-user-edit"></i> Редактирование существа</h3>
+                <div class="form-group">
+                    <label>Имя:</label>
+                    <input type="text" id="edit-name" class="form-control">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>КД:</label>
+                        <input type="number" id="edit-ac" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Бонус атаки:</label>
+                        <input type="number" id="edit-attack-bonus" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Урон:</label>
+                        <input type="text" id="edit-damage" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип урона:</label>
+                        <select id="edit-damage-type" class="form-control">
+                            <option value="slashing">Рубящий</option>
+                            <option value="piercing">Колющий</option>
+                            <option value="bludgeoning">Дробящий</option>
+                            <option value="fire">Огонь</option>
+                            <option value="cold">Холод</option>
+                            <option value="acid">Кислота</option>
+                            <option value="lightning">Электричество</option>
+                            <option value="poison">Яд</option>
+                            <option value="radiant">Свет</option>
+                            <option value="necrotic">Некротический</option>
+                            <option value="psychic">Психический</option>
+                            <option value="force">Силовой</option>
+                            <option value="thunder">Звук</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Резисты (через запятую):</label>
+                    <input type="text" id="edit-resistances" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Иммунитеты (через запятую):</label>
+                    <input type="text" id="edit-immunities" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Уязвимости (через запятую):</label>
+                    <input type="text" id="edit-vulnerabilities" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Мультиатака:</label>
+                    <input type="text" id="edit-multiattack" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Легендарные действия (через | ):</label>
+                    <textarea id="edit-legendary-actions" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Действия логова (через | ):</label>
+                    <textarea id="edit-lair-actions" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Выберите цвет:</label>
+                    <div class="color-picker" id="color-picker">
+                        <div class="color-option" style="background: #3498db;" data-color="#3498db"></div>
+                        <div class="color-option" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                        <div class="color-option" style="background: #2ecc71;" data-color="#2ecc71"></div>
+                        <div class="color-option" style="background: #f39c12;" data-color="#f39c12"></div>
+                        <div class="color-option" style="background: #9b59b6;" data-color="#9b59b6"></div>
+                        <div class="color-option" style="background: #1abc9c;" data-color="#1abc9c"></div>
+                        <div class="color-option" style="background: #e67e22;" data-color="#e67e22"></div>
+                        <div class="color-option" style="background: #34495e;" data-color="#34495e"></div>
+                        <div class="color-option" style="background: #d35400;" data-color="#d35400"></div>
+                        <div class="color-option" style="background: #c0392b;" data-color="#c0392b"></div>
+                    </div>
+                    <input type="hidden" id="edit-color" value="#3498db">
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="saveCreatureEdit()" class="btn btn-success">
+                        <i class="fas fa-save"></i> Сохранить изменения
+                    </button>
+                    <button onclick="closeModal('edit-creature-modal')" class="btn btn-warning">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js" defer></script>
+    </body>
+</html>
