@@ -28,13 +28,22 @@
     padding: 0;
 }
 
+html {
+    height: 100%;
+    overflow: auto;
+    overflow: visible;
+
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 7px;
     color: var(--dark);
     line-height: 1.6;
+    overflow: visible;
+    height: 100%;
 }
 
 .container {
@@ -43,32 +52,34 @@ body {
     background: white;
     border-radius: var(--radius);
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: calc(100vh - 40px);
+    height: calc(100vh - 40px);
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 40px);
 }
 
 header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     color: white;
-    padding: 20px;
+    padding: 8px 15px;
     text-align: center;
     flex-shrink: 0;
 }
 
 header h1 {
-    font-size: 2.2rem;
-    margin-bottom: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 header p {
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: 0.8rem;
+    opacity: 0.8;
 }
 
 .tabs {
@@ -76,11 +87,13 @@ header p {
     background: var(--primary);
     border-bottom: 3px solid var(--secondary);
     flex-shrink: 0;
+    padding: 0;
 }
 
 .tab {
     flex: 1;
-    padding: 15px;
+    padding: 8px 5px;
+    font-size: 0.85rem;
     text-align: center;
     color: white;
     cursor: pointer;
@@ -89,7 +102,7 @@ header p {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 9px;
     font-weight: 500;
 }
 
@@ -116,6 +129,7 @@ header p {
 .tab-content.active {
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .battle-content {
@@ -125,7 +139,8 @@ header p {
     gap: 20px;
     padding: 20px;
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto; 
+    position: relative;
 }
 
 .initiative-section {
@@ -133,6 +148,8 @@ header p {
     grid-row: 1;
     display: flex;
     flex-direction: column;
+    max-height: calc(70vh - 100px); /* Ограничение высоты */
+    min-height: 500px;
     overflow: hidden;
 }
 
@@ -150,6 +167,8 @@ header p {
     grid-column: 2;
     grid-row: 1;
     display: flex;
+    max-height: calc(70vh - 100px); /* Ограничение высоты */
+    min-height: 500px;
     flex-direction: column;
     overflow: hidden;
 }
@@ -192,8 +211,9 @@ header p {
 
 .battle-header {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    padding: 15px 20px;
+    padding: 7px 14px;
     display: flex;
+    gap: 7px;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--gray-light);
@@ -203,51 +223,124 @@ header p {
 .round-info {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 8px;
 }
 
 .round-info h2 {
-    font-size: 1.3rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .round-number {
     background: var(--warning);
     color: white;
-    padding: 5px 15px;
+    padding: 3px 10px;
     border-radius: 20px;
     font-weight: bold;
 }
 
 .initiative-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
 }
 
 .current-turn {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
+    gap: 8px;
+}
+
+.quick-actions .btn {
+    padding: 6px 10px; 
+    font-size: 0.85rem; 
+    min-width: 80px; 
+}
+
+.action-tabs {
+    display: flex;
+    background: var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
+}
+
+.action-tab {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 60px;
+}
+
+.action-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-tab.active {
+    background: var(--secondary);
+    box-shadow: inset 0 -2px 0 var(--warning);
 }
 
 .turn-indicator {
     background: white;
-    padding: 10px 20px;
+    padding: 7px 14px;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     font-weight: bold;
     color: var(--primary);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .quick-actions {
     display: flex;
     gap: 10px;
+}
+.initiative-controls .btn {
+    padding: 4px 8px; /* Уменьшено с 12px 15px */
+    font-size: 0.8rem; /* Уменьшено с 0.95rem */
+    height: auto; /* Отключаем фиксированную высоту */
+    min-height: 30px; /* Минимальная высота для удобства */
+}
+
+/* 2. Уменьшение кнопок быстрых действий */
+.quick-actions .btn {
+    padding: 4px 8px; /* Уменьшено с 6px 10px */
+    font-size: 0.8rem; /* Уменьшено с 0.85rem */
+    min-width: 70px; /* Уменьшено с 80px */
+    height: auto; /* Отключаем фиксированную высоту */
+    min-height: 30px; /* Минимальная высота */
+}
+
+/* 3. индикатор текущего хода */
+.turn-indicator {
+    padding: 4px 10px; /* Уменьшено с 7px 14px */
+    font-size: 0.85rem; /* Уменьшено */
+}
+
+/* 4. Уменьшение шрифта в заголовке раунда */
+.round-info h2 {
+    font-size: 0.9rem; /* Уменьшено с 1rem */
+}
+
+.round-number {
+    padding: 2px 8px; /* Уменьшено с 3px 10px */
+    font-size: 0.8rem; /* Уменьшено */
+}
+
+.battle-header {
+    padding: 6px 12px; /* Уменьшено с 8px 15px */
+    gap: 5px; /* Уменьшено с 7px */
 }
 
 .initiative-tracker {
@@ -370,7 +463,6 @@ header p {
     gap: 12px;
     font-size: 0.85rem;
     color: var(--gray);
-    flex-wrap: wrap;
 }
 
 .creature-stats span {
@@ -1128,8 +1220,8 @@ label {
 
 #saved-creatures {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 12px;
     max-height: none;
     height: auto;
     min-height: 500px;
@@ -1143,8 +1235,8 @@ label {
     padding: 20px;
     margin: 0;
     box-shadow: var(--shadow);
-    min-width: 350px;
-    max-width: 400px;
+    min-width: 300px;
+    max-width: 100%;
     height: fit-content;
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -1180,4 +1272,367 @@ label {
     outline: none;
     border-color: var(--secondary);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+
+
+@media (max-width: 1400px) {
+    header {
+        padding: 6px 12px;
+    }
+    
+    header h1 {
+        font-size: 1.4rem;
+        gap: 10px;
+    }
+    
+    .tabs {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        padding: 7px 4px;
+        font-size: 0.9rem;
+        min-width: 140px;
+        flex: none;
+        width: 25%;
+    }
+    
+    .tab-content {
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 1200px) {
+    .battle-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 15px;
+        padding: 15px;
+        height: auto;
+        min-height: 0;
+    }
+    
+    .initiative-section {
+        grid-column: 1;
+        grid-row: 1;
+        max-height: 400px;
+    }
+    
+    .creature-section {
+        grid-column: 1;
+        grid-row: 2;
+        max-height: 400px;
+    }
+    
+    .log-section {
+        grid-column: 1;
+        grid-row: 3;
+        height: 250px;
+        min-height: 250px;
+    }
+    
+    .battle-header {
+        flex-direction: column;
+        gap: 15px;
+        padding: 12px;
+    }
+    
+    .round-info {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .current-turn {
+        align-items: center;
+        width: 100%;
+    }
+    
+    .quick-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* 4. Адаптация раздела "Бестиарий" */
+@media (max-width: 1200px) {
+    #bestiary .other-tab-content .grid {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 15px;
+    }
+    
+    #bestiary .card:last-child {
+        min-height: 400px;
+        max-height: 600px;
+    }
+    
+    #saved-creatures {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+    
+    #saved-creatures .stat-block {
+        min-width: 280px;
+        max-width: 100%;
+        margin: 0;
+    }
+}
+
+/* 5. Адаптация для планшетов */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+    
+    .container {
+        height: calc(100vh - 10px);
+    }
+    
+    header {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        padding: 0 5px;
+    }
+    
+    .tab {
+        width: auto;
+        min-width: 120px;
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .battle-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .card-header {
+        padding: 10px 12px;
+    }
+    
+    .card-header h3 {
+        font-size: 1rem;
+    }
+    
+    .card-content {
+        padding: 10px;
+    }
+    
+    .initiative-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .creature-stats-detailed {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .group-management {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .group-select {
+        width: 100%;
+    }
+}
+
+/* 6. Адаптация для очень маленьких экранов */
+@media (max-width: 480px) {
+    .tab {
+        min-width: 100px;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .initiative-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px;
+    }
+    
+    .initiative-score {
+        margin-bottom: 8px;
+        align-self: flex-start;
+    }
+    
+    .creature-stats {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .hp-control {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .hp-input-small {
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .dice-roller {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    #saved-creatures {
+        grid-template-columns: 1fr;
+    }
+}
+
+.initiative-tracker,
+.creature-details,
+.log {
+    overflow-x: hidden;
+}
+
+/* 8. Исправление для драг-н-дроп на маленьких экранах */
+.initiative-item,
+.group-member {
+    touch-action: pan-y;
+}
+
+/* 9. Улучшение скроллбара для лучшего UX */
+.card-content::-webkit-scrollbar,
+.initiative-tracker::-webkit-scrollbar,
+.creature-details::-webkit-scrollbar,
+.log::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card-content::-webkit-scrollbar-track,
+.initiative-tracker::-webkit-scrollbar-track,
+.creature-details::-webkit-scrollbar-track,
+.log::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb,
+.initiative-tracker::-webkit-scrollbar-thumb,
+.creature-details::-webkit-scrollbar-thumb,
+.log::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.card-content::-webkit-scrollbar-thumb:hover,
+.initiative-tracker::-webkit-scrollbar-thumb:hover,
+.creature-details::-webkit-scrollbar-thumb:hover,
+.log::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* 10. Предотвращение наслоения элементов */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 11. Фикс для мобильных устройств */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover,
+    .tab:hover,
+    .initiative-item:hover {
+        transform: none;
+    }
+    
+    .dice-btn:hover {
+        transform: none;
+        box-shadow: var(--shadow);
+    }
+}
+
+/* 12. Улучшение читаемости на маленьких экранах */
+@media (max-width: 768px) {
+    .creature-name {
+        font-size: 0.95rem;
+    }
+    
+    .log-entry {
+        font-size: 0.85rem;
+        padding: 6px;
+    }
+    
+    .section h5 {
+        font-size: 0.95rem;
+    }
+    
+    .damage-mod {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 13. Адаптация формы создания существ в бестиарии */
+@media (max-width: 1200px) {
+    #bestiary .card:first-child {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    #bestiary .card-content {
+        max-height: none;
+    }
+}
+
+/* 14. Оптимизация для ландшафтной ориентации на планшетах */
+@media (max-width: 1024px) and (orientation: landscape) {
+    .battle-content {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+    }
+    
+    .initiative-section {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .creature-section {
+        grid-column: 2;
+        grid-row: 1;
+    }
+    
+    .log-section {
+        grid-column: 1 / span 2;
+        grid-row: 2;
+        height: 200px;
+    }
+    
+    #bestiary .other-tab-content .grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
