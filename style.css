@@ -15,7 +15,7 @@
     --dark: #2c3e50;
     --gray: #7f8c8d;
     --gray-light: #bdc3c7;
-    
+
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
     --radius: 8px;
@@ -120,7 +120,7 @@ header p {
 
 .battle-content {
     display: grid;
-    grid-template-columns: 1fr 1fr; 
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr auto;
     gap: 20px;
     padding: 20px;
@@ -137,13 +137,13 @@ header p {
 }
 
 .log-section {
-    grid-column: 1 / span 2; 
+    grid-column: 1 / span 2;
     grid-row: 2;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
-    height: 300px; 
+    height: 300px;
 }
 
 .creature-section {
@@ -295,9 +295,17 @@ header p {
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(243, 156, 18, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(243, 156, 18, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(243, 156, 18, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(243, 156, 18, 0);
+    }
 }
 
 .initiative-score {
@@ -362,6 +370,16 @@ header p {
     gap: 12px;
     font-size: 0.85rem;
     color: var(--gray);
+    flex-wrap: wrap;
+}
+
+.creature-stats span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    background: #f8f9fa;
+    border-radius: 4px;
 }
 
 .hp-display {
@@ -389,10 +407,21 @@ header p {
     gap: 4px;
 }
 
-.condition.warning { background: var(--warning); }
-.condition.danger { background: var(--danger); }
-.condition.success { background: var(--success); }
-.condition.info { background: var(--info); }
+.condition.warning {
+    background: var(--warning);
+}
+
+.condition.danger {
+    background: var(--danger);
+}
+
+.condition.success {
+    background: var(--success);
+}
+
+.condition.info {
+    background: var(--info);
+}
 
 .group-header {
     display: flex;
@@ -470,8 +499,15 @@ header p {
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .log-entry:last-child {
@@ -684,7 +720,7 @@ header p {
     position: absolute;
     background-color: white;
     min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: var(--radius-sm);
     overflow: hidden;
@@ -735,8 +771,15 @@ header p {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal-content {
@@ -752,8 +795,15 @@ header p {
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .modal h3 {
@@ -854,9 +904,26 @@ label {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
 }
 
 .other-tab-content {
@@ -874,7 +941,7 @@ label {
 
 .creatures-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 15px;
     max-height: 600px;
     overflow-y: auto;
@@ -1026,45 +1093,91 @@ label {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-@media (max-width: 1200px) {
-    .battle-content {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-    }
-    
-    .initiative-section {
-        grid-column: 1;
-        grid-row: 1;
-        min-height: 400px;
-    }
-    
-    .log-section {
-        grid-column: 1;
-        grid-row: 2;
-        min-height: 200px;
-    }
-    
-    .creature-section {
-        grid-column: 1;
-        grid-row: 3;
-        min-height: 300px;
-    }
-    
-    .creature-stats-detailed {
-        grid-template-columns: repeat(2, 1fr);
-    }
+/* Бестиарий - фиксированная высота карточки сохраненных существ */
+#bestiary .other-tab-content .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: calc(100vh - 250px);
 }
 
-@media (max-width: 768px) {
-    .creature-stats-detailed {
-        grid-template-columns: 1fr;
-    }
-    
-    .action-buttons {
-        grid-template-columns: 1fr;
-    }
-    
-    .dice-roller {
-        grid-template-columns: repeat(3, 1fr);
-    }
+#bestiary .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 6500px;
+}
+
+#bestiary .card:first-child {
+    /* Левая карточка - форма создания */
+    height: auto;
+    min-height: auto;
+}
+
+#bestiary .card:last-child {
+    /* Правая карточка - сохраненные существа */
+    min-height: 600px;
+    overflow: hidden;
+}
+
+#bestiary .card-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+#saved-creatures {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    max-height: none;
+    height: auto;
+    min-height: 500px;
+}
+
+/* Карточки существ в бестиарии */
+#saved-creatures .stat-block {
+    background: white;
+    border: 1px solid var(--primary);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin: 0;
+    box-shadow: var(--shadow);
+    min-width: 350px;
+    max-width: 400px;
+    height: fit-content;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#saved-creatures .stat-block:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Заголовок карточки существ */
+#saved-creatures .card-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 15px;
+    border-bottom: 3px solid var(--secondary);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Поиск в бестиарии */
+#creature-search {
+    width: 100%;
+    max-width: 300px;
+    padding: 8px 12px;
+    border: 2px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+#creature-search:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }

@@ -6,7 +6,9 @@ const state = {
         currentTurn: 0,
         round: 1,
         log: [],
-        groups: {}
+        groups: {},
+        history: [], // Добавляем историю
+        historyIndex: -1 // Текущая позиция в истории
     },
     groups: JSON.parse(localStorage.getItem('dnd_groups')) || {},
     currentCreature: null,
@@ -289,57 +291,140 @@ function renderSavedCreatures() {
     const container = document.getElementById('saved-creatures');
     const searchTerm = document.getElementById('creature-search')?.value.toLowerCase() || '';
     
+    // Обновляем счетчик существ
+    document.getElementById('creatures-count').textContent = `Всего: ${state.creatures.length}`;
+    
     const filteredCreatures = state.creatures.filter(creature =>
         creature.name.toLowerCase().includes(searchTerm) ||
         (creature.damageType && creature.damageType.includes(searchTerm))
     );
     
     if (filteredCreatures.length === 0) {
-        container.innerHTML = '<div class="empty-state">Нет сохранённых существ</div>';
+        container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
+                <i class="fas fa-dragon" style="font-size: 3rem; color: #bdc3c7; margin-bottom: 15px;"></i>
+                <h3>${searchTerm ? 'Ничего не найдено' : 'Нет сохранённых существ'}</h3>
+                <p>${searchTerm ? 'Попробуйте другой поисковый запрос' : 'Создайте первое существо в форме слева'}</p>
+            </div>
+        `;
         return;
     }
     
     container.innerHTML = filteredCreatures.map(creature => `
-        <div class="stat-block">
-            <div class="creature-name">
-                <span class="creature-color" style="background: ${creature.color || '#3498db'}"></span>
-                ${creature.name}
-                ${creature.legendaryActions && creature.legendaryActions.length > 0 ? 
-                    '<i class="fas fa-crown" title="Имеет легендарные действия"></i>' : ''}
-                ${creature.lairActions && creature.lairActions.length > 0 ? 
-                    '<i class="fas fa-mountain" title="Имеет действия логова"></i>' : ''}
+        <div class="stat-block" style="min-width: 400px; max-width: 500px;">
+            <div class="creature-header" style="margin-bottom: 15px;">
+                <div class="creature-name" style="font-size: 1.2rem; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;">
+                    <span class="creature-color" style="width: 20px; height: 20px; border-radius: 50%; display: inline-block; background: ${creature.color || '#3498db'};"></span>
+                    <span style="flex: 1;">${creature.name}</span>
+                    ${creature.legendaryActions && creature.legendaryActions.length > 0 ? 
+                        '<i class="fas fa-crown" title="Имеет легендарные действия" style="color: #f39c12;"></i>' : ''}
+                    ${creature.lairActions && creature.lairActions.length > 0 ? 
+                        '<i class="fas fa-mountain" title="Имеет действия логова" style="color: #7f8c8d;"></i>' : ''}
+                </div>
             </div>
-            <div class="creature-stats" style="margin: 10px 0; display: flex; gap: 15px;">
-                <span><i class="fas fa-heart"></i> ${creature.maxHP}</span>
-                <span><i class="fas fa-shield-alt"></i> ${creature.ac}</span>
-                <span><i class="fas fa-dice-d20"></i> +${creature.attackBonus}</span>
+            
+            <div class="creature-stats-grid" style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin: 15px 0;
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: var(--radius-sm);
+            ">
+                <div style="text-align: center;">
+                    <div style="font-size: 0.8em; color: #666;">HP</div>
+                    <div style="font-weight: bold; font-size: 1.2rem; color: #e74c3c;">
+                        <i class="fas fa-heart"></i> ${creature.maxHP}
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 0.8em; color: #666;">КД</div>
+                    <div style="font-weight: bold; font-size: 1.2rem; color: #3498db;">
+                        <i class="fas fa-shield-alt"></i> ${creature.ac}
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 0.8em; color: #666;">Атака</div>
+                    <div style="font-weight: bold; font-size: 1.2rem; color: #2ecc71;">
+                        <i class="fas fa-crosshairs"></i> +${creature.attackBonus}
+                    </div>
+                </div>
             </div>
-            <div style="margin: 10px 0;">
-                <strong>Урон:</strong> ${creature.damage} 
-                <span class="damage-type">${creature.damageType}</span>
+            
+            <div style="margin: 15px 0; padding: 10px; background: #fff8e1; border-radius: var(--radius-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Урон:</strong> 
+                        <span style="font-weight: bold; font-size: 1.1rem; margin-left: 5px;">${creature.damage}</span>
+                    </div>
+                    <span class="damage-type" style="background: ${getDamageTypeColor(creature.damageType)}; padding: 3px 10px; border-radius: 15px; color: white; font-size: 0.8rem;">
+                        ${creature.damageType}
+                    </span>
+                </div>
             </div>
+            
             ${creature.resistances && creature.resistances.length > 0 ? `
-                <div><small><strong>Сопр.:</strong> ${creature.resistances.join(', ')}</small></div>
+                <div style="margin: 10px 0; padding: 8px; background: #e8f4fd; border-radius: var(--radius-sm);">
+                    <div><strong>Сопр.:</strong> 
+                        ${creature.resistances.map(r => 
+                            `<span style="display: inline-block; padding: 2px 8px; background: var(--info); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">${r}</span>`
+                        ).join(' ')}
+                    </div>
+                </div>
             ` : ''}
+            
             ${creature.multiattack ? `
-                <div><small><strong>Мультиатака:</strong> ${creature.multiattack}</small></div>
+                <div style="margin: 10px 0; padding: 8px; background: #f0f8ff; border-radius: var(--radius-sm);">
+                    <div><strong>Мультиатака:</strong> ${creature.multiattack}</div>
+                </div>
             ` : ''}
-            <div class="btn-group" style="margin-top: 15px; display: flex; gap: 10px;">
-                <button onclick="addSingleToBattle(${creature.id})" class="btn btn-sm btn-primary">
+            
+            <div class="btn-group" style="
+                margin-top: 20px;
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            ">
+                <button onclick="addSingleToBattle(${creature.id})" 
+                        class="btn btn-sm btn-primary" style="padding: 8px 5px;">
                     <i class="fas fa-user"></i> В бой
                 </button>
-                <button onclick="showAddGroupToBattleModal(${creature.id})" class="btn btn-sm btn-info">
+                <button onclick="showAddGroupToBattleModal(${creature.id})" 
+                        class="btn btn-sm btn-info" style="padding: 8px 5px;">
                     <i class="fas fa-users"></i> Группа
                 </button>
-                <button onclick="editCreature(${creature.id})" class="btn btn-sm btn-warning">
-                    <i class="fas fa-edit"></i> Редактировать
+                <button onclick="editCreature(${creature.id})" 
+                        class="btn btn-sm btn-warning" style="padding: 8px 5px;">
+                    <i class="fas fa-edit"></i>
                 </button>
-                <button onclick="deleteCreature(${creature.id})" class="btn btn-sm btn-danger">
+                <button onclick="deleteCreature(${creature.id})" 
+                        class="btn btn-sm btn-danger" style="padding: 8px 5px;">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
         </div>
     `).join('');
+}
+
+// Вспомогательная функция для цветов типов урона
+function getDamageTypeColor(type) {
+    const colors = {
+        slashing: '#e74c3c',
+        piercing: '#3498db',
+        bludgeoning: '#8e44ad',
+        fire: '#f39c12',
+        cold: '#1abc9c',
+        acid: '#2ecc71',
+        lightning: '#f1c40f',
+        poison: '#9b59b6',
+        radiant: '#f1c40f',
+        necrotic: '#2c3e50',
+        psychic: '#e84393',
+        force: '#6c5ce7',
+        thunder: '#0984e3'
+    };
+    return colors[type] || '#7f8c8d';
 }
 
 // ============ БОЕВОЙ ТРЕКЕР ============
@@ -822,7 +907,7 @@ const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
                 <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
                 <span>🛡️ ${creature.ac}</span>
                 ${creature.tempHP > 0 ? 
-                    `<span class="temp-hp-display">🛡️ ${creature.tempHP}</span>` : ''}
+                    `<span class="temp-hp-display">🛡️✨ ${creature.tempHP}</span>` : ''}
             </div>
             <div class="conditions">
                 ${creature.conditions.map(c => 
@@ -932,7 +1017,7 @@ function createGroupElement(group, isActive) {
                         <div class="hp-display">
                             <span>❤️ ${member.currentHP}/${member.maxHP}</span>
                             ${member.tempHP > 0 ? 
-                                `<span class="temp-hp-display" style="font-size: 0.7rem;">🛡️ ${member.tempHP}</span>` : ''}
+                                `<span class="temp-hp-display" style="font-size: 0.7rem;">🛡️✨ ${member.tempHP}</span>` : ''}
                             ${member.concentration ? ' ✨' : ''}
                         </div>
                     </div>
@@ -1335,13 +1420,18 @@ function renderCreatureDetails() {
             <div class="temporary-hp-control">
                 <h5><i class="fas fa-shield-alt"></i> Временные хиты</h5>
                 <p style="font-size: 0.9em; margin-bottom: 10px;">
-                    <strong>Текущие:</strong> ${creature.tempHP} | 
-                    <strong>Эффективные HP:</strong> ${creature.currentHP + creature.tempHP}
+                    <strong>Текущие:</strong> ${creature.tempHP}
                 </p>
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="addTempHP(5, 'add')" class="btn btn-sm btn-warning">+5</button>
-                    <button onclick="addTempHP(10, 'add')" class="btn btn-sm btn-warning">+10</button>
-                    <button onclick="clearTempHP()" class="btn btn-sm btn-danger">Сбросить</button>
+                    <button onclick="addTempHP(5, 'add')" class="btn btn-sm" style="background: #f39c12; color: white;">
+                        <i class="fas fa-plus"></i> +5 временных HP
+                    </button>
+                    <button onclick="addTempHP(10, 'add')" class="btn btn-sm" style="background: #f39c12; color: white;">
+                        <i class="fas fa-plus"></i> +10 временных HP
+                    </button>
+                    <button onclick="clearTempHP()" class="btn btn-sm btn-danger">
+                        <i class="fas fa-trash"></i> Сбросить
+                    </button>
                 </div>
             </div>
             
@@ -1924,6 +2014,93 @@ function rollDamage(isCrit = false) {
         alert('Ошибка в выражении урона: ' + e.message);
     }
 }
+function saveBattleStateToHistory() {
+    // Можно сохранять состояние для возможного отката
+    // Пока просто оставляем как заглушку
+}
+// ============ СБРОС БОЯ ============
+
+function resetBattle() {
+    if (!confirm('Сбросить бой в начальное состояние?\n\nЭто вернет все HP к максимуму, обнулит временные HP, состояния, и сбросит раунды, но сохранит существ в инициативе.')) {
+        return;
+    }
+    
+    // Сохраняем оригинальные данные существ из бестиария для восстановления HP
+    const creatureResetMap = {};
+    state.creatures.forEach(cr => {
+        creatureResetMap[cr.id] = {
+            maxHP: cr.maxHP,
+            ac: cr.ac,
+            attackBonus: cr.attackBonus,
+            damage: cr.damage,
+            damageType: cr.damageType,
+            resistances: [...(cr.resistances || [])],
+            immunities: [...(cr.immunities || [])],
+            vulnerabilities: [...(cr.vulnerabilities || [])]
+        };
+    });
+    
+    // Восстанавливаем каждого участника боя
+    state.battle.participants.forEach(participant => {
+        // Находим оригинальное существо в бестиарии
+        const original = state.creatures.find(c => c.id === participant.id);
+        const resetData = creatureResetMap[participant.id];
+        
+        if (resetData) {
+            // Восстанавливаем HP
+            participant.currentHP = resetData.maxHP;
+            participant.maxHP = resetData.maxHP;
+            
+            // Восстанавливаем другие параметры из оригинала
+            participant.ac = resetData.ac;
+            participant.attackBonus = resetData.attackBonus;
+            participant.damage = resetData.damage;
+            participant.damageType = resetData.damageType;
+            participant.resistances = [...resetData.resistances];
+            participant.immunities = [...resetData.immunities];
+            participant.vulnerabilities = [...resetData.vulnerabilities];
+        } else if (original) {
+            // Для существ, у которых нет id из бестиария, но есть совпадение по имени
+            participant.currentHP = original.maxHP;
+            participant.maxHP = original.maxHP;
+        } else {
+            // Для быстрых NPC используем текущее maxHP
+            participant.currentHP = participant.maxHP;
+        }
+        
+        // Сбрасываем временные HP
+        participant.tempHP = 0;
+        
+        // Сбрасываем состояния
+        participant.conditions = [];
+        
+        // Сбрасываем концентрацию
+        participant.concentration = false;
+        
+        // Сбрасываем использованные действия
+        participant.usedLegendaryActions = 0;
+        participant.usedLairActions = false;
+    });
+    
+    // Сбрасываем раунд и текущий ход
+    state.battle.round = 1;
+    state.battle.currentTurn = 0;
+    
+    // Переброс инициативы (опционально, можно закомментировать если нужно сохранить инициативу)
+    // rollAllInitiative();
+    
+    // Очищаем историю боя
+    state.battle.log = [];
+    document.getElementById('battle-log').innerHTML = '';
+    
+    // Обновляем отображение
+    renderBattle();
+    updateRoundDisplay();
+    saveToLocalStorage();
+    
+    addToLog('=== БОЙ СБРОШЕН В НАЧАЛЬНОЕ СОСТОЯНИЕ ===');
+    addToLog('Все HP восстановлены, состояния сброшены');
+}
 
 // ============ БЫСТРЫЙ NPC ============
 
@@ -1992,9 +2169,9 @@ function addQuickNPC() {
 // ============ УПРАВЛЕНИЕ ХОДОМ ============
 
 function nextTurn() {
-    if (state.battle.participants.length === 0) return;
+    if (state.battle.participants.length === 0) return;    
+    saveBattleStateToHistory();
     
-    // Уменьшаем длительность состояний у текущего существа
     const current = state.battle.participants[state.battle.currentTurn];
     if (current) {
         current.conditions = current.conditions.filter(cond => {
@@ -2004,11 +2181,11 @@ function nextTurn() {
     }
     
     // Переходим к следующему существу
-    state.battle.currentTurn = (state.battle.currentTurn + 1) % state.battle.participants.length;
+    state.battle.currentTurn++;
     
-    // Если вернулись к первому - новый раунд
-    if (state.battle.currentTurn === 0) {
+    if (state.battle.currentTurn >= state.battle.participants.length) {
         newRound();
+        return;
     }
     
     renderBattle();
@@ -2018,23 +2195,62 @@ function nextTurn() {
     addToLog(`Ход: ${newCurrent ? newCurrent.name : '???'}`);
 }
 
+
+
 function previousTurn() {
     if (state.battle.participants.length === 0) return;
     
+    // Увеличиваем длительность состояний у текущего существа
+    const current = state.battle.participants[state.battle.currentTurn];
+    if (current) {
+        current.conditions.forEach(cond => {
+            cond.duration++;
+        });
+    }
+    
     state.battle.currentTurn = (state.battle.currentTurn - 1 + state.battle.participants.length) % state.battle.participants.length;
+    
+    // Если вернулись к последнему существу - уменьшаем раунд
+    if (state.battle.currentTurn === state.battle.participants.length - 1) {
+        if (state.battle.round > 1) {
+            state.battle.round--;
+            addToLog(`=== Откат к раунду ${state.battle.round} ===`);
+        }
+    }
+    
     renderBattle();
     saveToLocalStorage();
     
-    const current = state.battle.participants[state.battle.currentTurn];
-    addToLog(`Возврат к: ${current ? current.name : '???'}`);
+    const newCurrent = state.battle.participants[state.battle.currentTurn];
+    addToLog(`Вернулись к: ${newCurrent ? newCurrent.name : '???'}`);
 }
 
 function newRound() {
+    saveBattleStateToHistory();
+    
     state.battle.round++;
+    state.battle.currentTurn = 0;
+    
+    // Уменьшаем длительность всех состояний у всех существ
+    state.battle.participants.forEach(creature => {
+        creature.conditions = creature.conditions.filter(cond => {
+            cond.duration--;
+            return cond.duration > 0;
+        });
+        creature.usedLegendaryActions = 0;
+        creature.usedLairActions = false;
+    });
     
     updateRoundDisplay();
     saveToLocalStorage();
     addToLog(`=== Начало раунда ${state.battle.round} ===`);
+    
+    renderBattle();
+
+    const currentCreature = state.battle.participants[state.battle.currentTurn];
+    if (currentCreature) {
+        addToLog(`Ход: ${currentCreature.name}`);
+    }
 }
 
 function updateRoundDisplay() {
@@ -2042,7 +2258,6 @@ function updateRoundDisplay() {
 }
 
 // ============ МОДАЛЬНЫЕ ОКНА ============
-
 function showModal(modalId) {
     document.getElementById(modalId).style.display = 'flex';
 }
@@ -2358,3 +2573,4 @@ function changeAC(index, amount) {
     renderBattle();
     saveToLocalStorage();
 }
+
