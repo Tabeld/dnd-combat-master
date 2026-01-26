@@ -1274,7 +1274,324 @@ label {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
+.condition-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
 
+.condition-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.condition-badge.blinded {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    color: white;
+}
+
+.condition-badge.charmed {
+    background: linear-gradient(135deg, #e84393 0%, #fd79a8 100%);
+    color: white;
+}
+
+.condition-badge.frightened {
+    background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%);
+    color: white;
+}
+
+.condition-badge.grappled {
+    background: linear-gradient(135deg, #00cec9 0%, #81ecec 100%);
+    color: white;
+}
+
+.condition-badge.paralyzed {
+    background: linear-gradient(135deg, #0984e3 0%, #74b9ff 100%);
+    color: white;
+}
+
+.condition-badge.petrified {
+    background: linear-gradient(135deg, #636e72 0%, #b2bec3 100%);
+    color: white;
+}
+
+.condition-badge.poisoned {
+    background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+    color: white;
+}
+
+.condition-badge.prone {
+    background: linear-gradient(135deg, #fdcb6e 0%, #ffeaa7 100%);
+    color: #2d3436;
+}
+
+.condition-badge.restrained {
+    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    color: white;
+}
+
+.condition-badge.stunned {
+    background: linear-gradient(135deg, #e74c3c 0%, #ff7675 100%);
+    color: white;
+}
+
+.condition-badge.unconscious {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    color: white;
+}
+
+.condition-badge.invisible {
+    background: linear-gradient(135deg, #00cec9 0%, #81ecec 100%);
+    color: white;
+    border: 1px dashed #0984e3;
+}
+
+/* Управление легендарными действиями */
+.legendary-actions-container {
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+    border: 2px solid #f39c12;
+    border-radius: var(--radius);
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.legendary-action-btn {
+    width: 100%;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.legendary-action-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(243, 156, 18, 0.3);
+}
+
+.legendary-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #95a5a6;
+}
+
+.legendary-action-used {
+    background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+}
+
+.legendary-actions-counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(243, 156, 18, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+/* Улучшенное отображение состояний */
+.conditions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.condition-with-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--secondary);
+}
+
+.condition-duration {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.condition-duration-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: var(--secondary);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.condition-duration-btn:hover {
+    background: var(--secondary-dark);
+}
+
+/* Счётчик легендарных действий */
+.legendary-counter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.legendary-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #bdc3c7;
+    display: inline-block;
+}
+
+.legendary-dot.used {
+    background: #e74c3c;
+}
+
+.legendary-dot.available {
+    background: #2ecc71;
+}
+
+/* Стиль для кнопки очистки боя */
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+.initiative-section .card-header .btn-sm {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    height: auto;
+    min-height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Стили для модального окна просмотра существа */
+.creature-view-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.view-creature-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.view-stat-item {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--secondary);
+}
+
+.view-stat-item label {
+    font-size: 0.85rem;
+    color: var(--gray);
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.view-stat-item span {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--primary);
+}
+
+.view-damage-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.view-damage-mod {
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.view-damage-mod.resistance {
+    background: var(--info);
+    color: white;
+}
+
+.view-damage-mod.immunity {
+    background: var(--gray);
+    color: white;
+}
+
+.view-damage-mod.vulnerability {
+    background: var(--danger);
+    color: white;
+}
+
+.view-actions-list {
+    margin-top: 10px;
+}
+
+.view-action-item {
+    background: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--warning);
+    font-size: 0.9rem;
+}
+
+.view-action-item.legendary {
+    border-left-color: #f39c12;
+    background: #fff8e1;
+}
+
+.view-action-item.lair {
+    border-left-color: #7f8c8d;
+    background: #f8f9fa;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    .view-creature-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Для адаптивных версий */
+@media (max-width: 1200px) {
+    .initiative-section .card-header .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        min-height: 30px;
+    }
+}
 
 @media (max-width: 1400px) {
     header {
@@ -1356,7 +1673,7 @@ label {
     }
 }
 
-/* 4. Адаптация раздела "Бестиарий" */
+/* Адаптация раздела "Бестиарий" */
 @media (max-width: 1200px) {
     #bestiary .other-tab-content .grid {
         grid-template-columns: 1fr;
@@ -1381,7 +1698,7 @@ label {
     }
 }
 
-/* 5. Адаптация для планшетов */
+/* Адаптация для планшетов */
 @media (max-width: 768px) {
     body {
         padding: 5px;
@@ -1462,7 +1779,7 @@ label {
     }
 }
 
-/* 6. Адаптация для очень маленьких экранов */
+/* Адаптация для очень маленьких экранов */
 @media (max-width: 480px) {
     .tab {
         min-width: 100px;
@@ -1520,13 +1837,13 @@ label {
     overflow-x: hidden;
 }
 
-/* 8. Исправление для драг-н-дроп на маленьких экранах */
+/* Исправление для драг-н-дроп на маленьких экранах */
 .initiative-item,
 .group-member {
     touch-action: pan-y;
 }
 
-/* 9. Улучшение скроллбара для лучшего UX */
+/* Улучшение скроллбара для лучшего UX */
 .card-content::-webkit-scrollbar,
 .initiative-tracker::-webkit-scrollbar,
 .creature-details::-webkit-scrollbar,
@@ -1557,12 +1874,12 @@ label {
     background: #a8a8a8;
 }
 
-/* 10. Предотвращение наслоения элементов */
 * {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* 11. Фикс для мобильных устройств */
+
+/* Фикс для мобильных устройств */
 @media (hover: none) and (pointer: coarse) {
     .btn:hover,
     .tab:hover,
@@ -1576,7 +1893,7 @@ label {
     }
 }
 
-/* 12. Улучшение читаемости на маленьких экранах */
+/* Улучшение читаемости на маленьких экранах */
 @media (max-width: 768px) {
     .creature-name {
         font-size: 0.95rem;
@@ -1597,7 +1914,7 @@ label {
     }
 }
 
-/* 13. Адаптация формы создания существ в бестиарии */
+/* Адаптация формы создания существ в бестиарии */
 @media (max-width: 1200px) {
     #bestiary .card:first-child {
         max-height: none;
@@ -1609,7 +1926,7 @@ label {
     }
 }
 
-/* 14. Оптимизация для ландшафтной ориентации на планшетах */
+/* Оптимизация для ландшафтной ориентации на планшетах */
 @media (max-width: 1024px) and (orientation: landscape) {
     .battle-content {
         grid-template-columns: 1fr 1fr;
@@ -1636,3 +1953,4 @@ label {
         grid-template-columns: 1fr 1fr;
     }
 }
+

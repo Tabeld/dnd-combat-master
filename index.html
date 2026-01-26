@@ -96,6 +96,9 @@
                                             class="fas fa-sort-numeric-down-alt"></i>
                                         Сортировать
                                     </button>
+                                    <button onclick="clearBattleWithSave()" class="btn btn-danger">
+                                        <i class="fas fa-trash-alt"></i> Удалить
+                                    </button>
                                 </div>
                             </div>
                             <div class="card-content initiative-tracker">
@@ -621,6 +624,7 @@
                     <option value="stunned">Оглушён</option>
                     <option value="unconscious">Бессознателен</option>
                     <option value="invisible">Невидим</option>
+                    <option value="concentration">Концентрация</option>
                 </select>
                 <div class="form-group">
                     <label>Длительность (ходов):</label>
@@ -932,7 +936,22 @@
                 </div>
             </div>
         </div>
-
+        <!-- Модальное окно просмотра существа -->
+        <div id="view-creature-modal" class="modal">
+            <div class="modal-content" style="max-width: 700px;">
+                <h3><i class="fas fa-eye"></i> Просмотр существа</h3>
+                <div id="view-creature-content" class="creature-view-content">
+                    <!-- Контент будет заполнен JavaScript -->
+                </div>
+                <div class="modal-buttons">
+                    <button onclick="closeModal('view-creature-modal')" 
+                            class="btn btn-primary">
+                        <i class="fas fa-times"></i> Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+        
         <script src="script.js" defer></script>
     </body>
 </html>

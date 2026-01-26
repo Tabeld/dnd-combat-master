@@ -41,24 +41,24 @@ const defaultColors = [
 ];
 
 // Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('D&D Combat Master загружен');
-    
+
     initTabs();
     renderSavedCreatures();
     renderBattle();
     updateContextCreatures();
     initColorPickers();
-    
+
     // Автосохранение
     setInterval(saveToLocalStorage, 3000);
-    
+
     // Восстановление из localStorage
     if (state.battle.participants.length > 0) {
         updateRoundDisplay();
         addToLog('Сессия восстановлена из сохранения');
     }
-    
+
     // Поиск существ
     const searchInput = document.getElementById('creature-search');
     if (searchInput) {
@@ -71,13 +71,13 @@ function initColorPickers() {
     // Цветовой пикер для формы создания существа
     const creatureColorPicker = document.querySelector('#creature-form .color-picker');
     if (creatureColorPicker) {
-        creatureColorPicker.addEventListener('click', function(e) {
+        creatureColorPicker.addEventListener('click', function (e) {
             const colorOption = e.target.closest('.color-option');
             if (!colorOption) return;
-            
+
             const color = colorOption.dataset.color;
             document.getElementById('cr-color').value = color;
-            
+
             // Убираем выделение со всех и выделяем выбранный
             document.querySelectorAll('#creature-form .color-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -85,17 +85,17 @@ function initColorPickers() {
             colorOption.classList.add('selected');
         });
     }
-    
+
     // Цветовой пикер для быстрого NPC
     const quickNpcColorPicker = document.querySelector('#quick-npc-modal .color-picker');
     if (quickNpcColorPicker) {
-        quickNpcColorPicker.addEventListener('click', function(e) {
+        quickNpcColorPicker.addEventListener('click', function (e) {
             const colorOption = e.target.closest('.color-option');
             if (!colorOption) return;
-            
+
             const color = colorOption.dataset.color;
             document.getElementById('quick-npc-color').value = color;
-            
+
             // Убираем выделение со всех и выделяем выбранный
             document.querySelectorAll('#quick-npc-modal .color-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -103,17 +103,17 @@ function initColorPickers() {
             colorOption.classList.add('selected');
         });
     }
-    
+
     // Цветовой пикер для редактирования существа
     const editColorPicker = document.getElementById('color-picker');
     if (editColorPicker) {
-        editColorPicker.addEventListener('click', function(e) {
+        editColorPicker.addEventListener('click', function (e) {
             const colorOption = e.target.closest('.color-option');
             if (!colorOption) return;
-            
+
             const color = colorOption.dataset.color;
             document.getElementById('edit-color').value = color;
-            
+
             // Убираем выделение со всех и выделяем выбранный
             document.querySelectorAll('#color-picker .color-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -133,7 +133,7 @@ function initTabs() {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             tab.classList.add('active');
             document.getElementById(tabId).classList.add('active');
-            
+
             if (tabId === 'bestiary') {
                 renderSavedCreatures();
             } else if (tabId === 'battle') {
@@ -152,7 +152,7 @@ function saveCreature() {
         alert('Введите имя существа');
         return;
     }
-    
+
     const creatureData = {
         name: name,
         maxHP: parseInt(document.getElementById('cr-max-hp').value) || 10,
@@ -169,7 +169,7 @@ function saveCreature() {
         lairActions: parseActions(document.getElementById('cr-lair-actions').value),
         color: document.getElementById('cr-color').value || '#3498db'
     };
-    
+
     if (state.editingCreatureId) {
         // Редактирование существующего существа
         const index = state.creatures.findIndex(c => c.id === state.editingCreatureId);
@@ -190,7 +190,7 @@ function saveCreature() {
         state.creatures.push(creature);
         addToLog(`Создано существо: ${creature.name}`);
     }
-    
+
     saveToLocalStorage();
     renderSavedCreatures();
     resetCreatureForm();
@@ -200,7 +200,7 @@ function saveCreature() {
 function editCreature(creatureId) {
     const creature = state.creatures.find(c => c.id === creatureId);
     if (!creature) return;
-    
+
     // Заполняем форму данными существа
     document.getElementById('cr-id').value = creature.id;
     document.getElementById('cr-name').value = creature.name;
@@ -217,7 +217,7 @@ function editCreature(creatureId) {
     document.getElementById('cr-legendary-actions').value = creature.legendaryActions ? creature.legendaryActions.join('|') : '';
     document.getElementById('cr-lair-actions').value = creature.lairActions ? creature.lairActions.join('|') : '';
     document.getElementById('cr-color').value = creature.color || '#3498db';
-    
+
     // Устанавливаем выбранный цвет
     document.querySelectorAll('#creature-form .color-option').forEach(opt => {
         opt.classList.remove('selected');
@@ -225,13 +225,13 @@ function editCreature(creatureId) {
             opt.classList.add('selected');
         }
     });
-    
+
     // Показываем режим редактирования
     state.editingCreatureId = creatureId;
     document.getElementById('form-title').textContent = 'Редактировать существо';
     document.getElementById('save-button-text').textContent = 'Обновить существо';
     document.getElementById('edit-controls').style.display = 'block';
-    
+
     // Прокручиваем к форме
     document.querySelector('[data-tab="bestiary"]').click();
     document.getElementById('creature-form').scrollIntoView({ behavior: 'smooth' });
@@ -260,7 +260,7 @@ function resetCreatureForm() {
     document.getElementById('cr-legendary-actions').value = '';
     document.getElementById('cr-lair-actions').value = '';
     document.getElementById('cr-color').value = '#3498db';
-    
+
     // Сбрасываем цветовой пикер
     document.querySelectorAll('#creature-form .color-option').forEach(opt => {
         opt.classList.remove('selected');
@@ -268,7 +268,7 @@ function resetCreatureForm() {
             opt.classList.add('selected');
         }
     });
-    
+
     document.getElementById('form-title').textContent = 'Создать существо';
     document.getElementById('save-button-text').textContent = 'Сохранить существо';
     document.getElementById('edit-controls').style.display = 'none';
@@ -290,15 +290,15 @@ function parseActions(input) {
 function renderSavedCreatures() {
     const container = document.getElementById('saved-creatures');
     const searchTerm = document.getElementById('creature-search')?.value.toLowerCase() || '';
-    
+
     // Обновляем счетчик существ
     document.getElementById('creatures-count').textContent = `Всего: ${state.creatures.length}`;
-    
+
     const filteredCreatures = state.creatures.filter(creature =>
         creature.name.toLowerCase().includes(searchTerm) ||
         (creature.damageType && creature.damageType.includes(searchTerm))
     );
-    
+
     if (filteredCreatures.length === 0) {
         container.innerHTML = `
             <div class="empty-state" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
@@ -309,17 +309,18 @@ function renderSavedCreatures() {
         `;
         return;
     }
-    
+
     container.innerHTML = filteredCreatures.map(creature => `
-        <div class="stat-block" style="min-width: 400px; max-width: 500px;">
+        <div class="stat-block" style="min-width: 400px; max-width: 500px; cursor: pointer;"
+            ondblclick="viewCreatureDetails(${creature.id})">
             <div class="creature-header" style="margin-bottom: 15px;">
                 <div class="creature-name" style="font-size: 1.2rem; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;">
                     <span class="creature-color" style="width: 20px; height: 20px; border-radius: 50%; display: inline-block; background: ${creature.color || '#3498db'};"></span>
                     <span style="flex: 1;">${creature.name}</span>
-                    ${creature.legendaryActions && creature.legendaryActions.length > 0 ? 
-                        '<i class="fas fa-crown" title="Имеет легендарные действия" style="color: #f39c12;"></i>' : ''}
-                    ${creature.lairActions && creature.lairActions.length > 0 ? 
-                        '<i class="fas fa-mountain" title="Имеет действия логова" style="color: #7f8c8d;"></i>' : ''}
+                    ${creature.legendaryActions && creature.legendaryActions.length > 0 ?
+            '<i class="fas fa-crown" title="Имеет легендарные действия" style="color: #f39c12;"></i>' : ''}
+                    ${creature.lairActions && creature.lairActions.length > 0 ?
+            '<i class="fas fa-mountain" title="Имеет действия логова" style="color: #7f8c8d;"></i>' : ''}
                 </div>
             </div>
             
@@ -367,9 +368,9 @@ function renderSavedCreatures() {
             ${creature.resistances && creature.resistances.length > 0 ? `
                 <div style="margin: 10px 0; padding: 8px; background: #e8f4fd; border-radius: var(--radius-sm);">
                     <div><strong>Сопр.:</strong> 
-                        ${creature.resistances.map(r => 
-                            `<span style="display: inline-block; padding: 2px 8px; background: var(--info); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">${r}</span>`
-                        ).join(' ')}
+                        ${creature.resistances.map(r =>
+                `<span style="display: inline-block; padding: 2px 8px; background: var(--info); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">${r}</span>`
+            ).join(' ')}
                     </div>
                 </div>
             ` : ''}
@@ -433,14 +434,14 @@ function getDamageTypeColor(type) {
 function showCreateGroupModal() {
     const templateSelect = document.getElementById('group-template');
     templateSelect.innerHTML = '<option value="">Выберите существо</option>';
-    
+
     state.creatures.forEach(creature => {
         const option = document.createElement('option');
         option.value = creature.id;
         option.textContent = creature.name;
         templateSelect.appendChild(option);
     });
-    
+
     showModal('create-group-modal');
 }
 
@@ -451,26 +452,26 @@ function createGroupFromModal() {
     const templateId = parseInt(document.getElementById('group-template').value);
     const numberingType = document.getElementById('group-numbering').value;
     const autoColors = document.getElementById('auto-colors').checked;
-    
+
     if (!groupName) {
         alert('Введите название группы');
         return;
     }
-    
+
     if (!templateId) {
         alert('Выберите шаблон существа');
         return;
     }
-    
+
     const template = state.creatures.find(c => c.id === templateId);
     if (!template) {
         alert('Шаблон не найден');
         return;
     }
-    
+
     const groupId = `group_${Date.now()}`;
     const groupInitiative = rollInitiative(template.initBonus || 0);
-    
+
     // Создаем уникальные цвета для существ
     const colors = [];
     if (autoColors) {
@@ -483,17 +484,17 @@ function createGroupFromModal() {
             colors.push(template.color || '#3498db');
         }
     }
-    
+
     for (let i = 0; i < count; i++) {
         const creature = createCreatureInstance(template, Date.now() + i);
         creature.initiative = groupInitiative;
         creature.groupId = groupId;
         creature.groupNumber = i + 1;
         creature.color = colors[i];
-        
+
         // Формируем имя в зависимости от типа нумерации
         let numberSuffix = '';
-        switch(numberingType) {
+        switch (numberingType) {
             case 'numbers':
                 numberSuffix = ` ${i + 1}`;
                 break;
@@ -505,16 +506,16 @@ function createGroupFromModal() {
                 numberSuffix = ` ${romanNumerals[i] || i + 1}`;
                 break;
         }
-        
+
         creature.name = `${groupName}${numberSuffix}`;
         creature.baseName = groupName;
         creature.groupName = `Группа "${groupName}"`;
-        
+
         state.battle.participants.push(creature);
     }
-    
+
     addToLog(`Создана группа "${groupName}" (${count} существ) с инициативой ${groupInitiative}`);
-    
+
     sortInitiative();
     renderBattle();
     updateContextCreatures();
@@ -526,13 +527,13 @@ function createGroupFromModal() {
 function showAddToBattleModal() {
     const container = document.getElementById('battle-creatures-list');
     container.innerHTML = '';
-    
+
     if (state.creatures.length === 0) {
         container.innerHTML = '<div class="empty-state">Нет сохранённых существ</div>';
         showModal('add-to-battle-modal');
         return;
     }
-    
+
     // Добавляем кнопку для создания группы
     const groupButton = document.createElement('div');
     groupButton.className = 'stat-block';
@@ -545,7 +546,7 @@ function showAddToBattleModal() {
         </div>
     `;
     container.appendChild(groupButton);
-    
+
     // Добавляем существ
     container.innerHTML += state.creatures.map(creature => `
         <div class="stat-block">
@@ -569,7 +570,7 @@ function showAddToBattleModal() {
             </div>
         </div>
     `).join('');
-    
+
     showModal('add-to-battle-modal');
 }
 
@@ -577,30 +578,30 @@ function showAddToBattleModal() {
 function showAddGroupToBattleModal(creatureId) {
     const template = state.creatures.find(c => c.id === creatureId);
     if (!template) return;
-    
+
     const groupName = prompt('Название группы:', template.name);
     if (!groupName) return;
-    
+
     const count = prompt('Сколько существ в группе?', '3');
     if (!count) return;
-    
+
     const numCount = parseInt(count);
     if (isNaN(numCount) || numCount < 1) {
         alert('Введите корректное число');
         return;
     }
-    
+
     const numberingType = prompt('Тип нумерации (numbers, letters, roman):', 'numbers');
     if (!['numbers', 'letters', 'roman'].includes(numberingType)) {
         alert('Некорректный тип нумерации. Используйте: numbers, letters, roman');
         return;
     }
-    
+
     const autoColors = confirm('Автоматически задать разные цвета?');
-    
+
     const groupId = `group_${Date.now()}`;
     const groupInitiative = rollInitiative(template.initBonus || 0);
-    
+
     // Создаем уникальные цвета для существ
     const colors = [];
     if (autoColors) {
@@ -613,17 +614,17 @@ function showAddGroupToBattleModal(creatureId) {
             colors.push(template.color || '#3498db');
         }
     }
-    
+
     for (let i = 0; i < numCount; i++) {
         const creature = createCreatureInstance(template, Date.now() + i);
         creature.initiative = groupInitiative;
         creature.groupId = groupId;
         creature.groupNumber = i + 1;
         creature.color = colors[i];
-        
+
         // Формируем имя в зависимости от типа нумерации
         let numberSuffix = '';
-        switch(numberingType) {
+        switch (numberingType) {
             case 'numbers':
                 numberSuffix = ` ${i + 1}`;
                 break;
@@ -635,16 +636,16 @@ function showAddGroupToBattleModal(creatureId) {
                 numberSuffix = ` ${romanNumerals[i] || i + 1}`;
                 break;
         }
-        
+
         creature.name = `${groupName}${numberSuffix}`;
         creature.baseName = groupName;
         creature.groupName = `Группа "${groupName}"`;
-        
+
         state.battle.participants.push(creature);
     }
-    
+
     addToLog(`Создана группа "${groupName}" (${numCount} существ) с инициативой ${groupInitiative}`);
-    
+
     sortInitiative();
     renderBattle();
     updateContextCreatures();
@@ -656,13 +657,13 @@ function showAddGroupToBattleModal(creatureId) {
 function addSingleToBattle(creatureId) {
     const template = state.creatures.find(c => c.id === creatureId);
     if (!template) return;
-    
+
     const creature = createCreatureInstance(template, Date.now());
     creature.color = template.color || '#3498db';
     state.battle.participants.push(creature);
-    
+
     addToLog(`Добавлено существо "${creature.name}" с инициативой ${creature.initiative}`);
-    
+
     sortInitiative();
     renderBattle();
     updateContextCreatures();
@@ -705,7 +706,7 @@ function rollAllInitiative() {
     // Для групп: сначала собираем все группы
     const groups = {};
     const groupInitiatives = {};
-    
+
     // Собираем группы и их участников
     state.battle.participants.forEach(creature => {
         if (creature.groupId) {
@@ -717,7 +718,7 @@ function rollAllInitiative() {
             groups[creature.groupId].push(creature);
         }
     });
-    
+
     // Устанавливаем инициативу для всех членов группы
     Object.keys(groups).forEach(groupId => {
         const groupInitiative = groupInitiatives[groupId];
@@ -725,14 +726,14 @@ function rollAllInitiative() {
             member.initiative = groupInitiative;
         });
     });
-    
+
     // Для одиночных существ бросаем инициативу индивидуально
     state.battle.participants.forEach(creature => {
         if (!creature.groupId) {
             creature.initiative = rollInitiative(creature.initBonus || 0);
         }
     });
-    
+
     sortInitiative();
     renderBattle();
     saveToLocalStorage();
@@ -742,10 +743,10 @@ function rollAllInitiative() {
 // Функция сортировки инициативы
 function sortInitiative() {
     if (state.battle.participants.length === 0) return;
-    
+
     // Создаем массив для сортировки
     const toSort = [...state.battle.participants];
-    
+
     // Сортируем по инициативе (от большего к меньшему)
     toSort.sort((a, b) => {
         if (b.initiative === a.initiative) {
@@ -754,10 +755,10 @@ function sortInitiative() {
         }
         return b.initiative - a.initiative;
     });
-    
+
     // Обновляем исходный массив
     state.battle.participants = toSort;
-    
+
     saveToLocalStorage();
 }
 
@@ -765,40 +766,40 @@ function sortInitiative() {
 function renderBattle() {
     const list = document.getElementById('initiative-list');
     const details = document.getElementById('creature-details');
-    
+
     list.innerHTML = '';
-    
+
     if (state.battle.participants.length === 0) {
         list.innerHTML = '<div class="empty-state">Нет участников боя. Добавьте существ!</div>';
         details.innerHTML = '<div class="empty-state">Выберите существо для управления</div>';
         document.getElementById('current-turn-name').textContent = '-';
         return;
     }
-    
+
     // Обновление текущего хода
     const current = state.battle.participants[state.battle.currentTurn];
     document.getElementById('current-turn-name').textContent = current ? current.name : '-';
-    
+
     // Группируем существа для отображения
     const groups = {};
     const standalone = [];
-    
+
     // Помечаем всех как необработанных
     state.battle.participants.forEach(c => c._processed = false);
-    
+
     // Сначала собираем группы
     for (let i = 0; i < state.battle.participants.length; i++) {
         const creature = state.battle.participants[i];
-        
+
         if (creature._processed) continue;
-        
+
         if (creature.groupId) {
             // Находим всех существ с таким же groupId
             const groupMembers = state.battle.participants.filter(p => p.groupId === creature.groupId);
-            
+
             // Помечаем всех членов группы как обработанные
             groupMembers.forEach(member => member._processed = true);
-            
+
             // Создаем запись группы
             groups[creature.groupId] = {
                 id: creature.groupId,
@@ -813,17 +814,17 @@ function renderBattle() {
             standalone.push({ ...creature, index: i });
         }
     }
-    
+
     // Сортируем группы по инициативе
     const sortedGroups = Object.values(groups).sort((a, b) => b.initiative - a.initiative);
-    
+
     // Сортируем одиночные существа по инициативе
     standalone.sort((a, b) => b.initiative - a.initiative);
-    
+
     // Объединяем отсортированные группы и одиночные существа
     const displayItems = [];
     let groupIdx = 0, standaloneIdx = 0;
-    
+
     while (groupIdx < sortedGroups.length || standaloneIdx < standalone.length) {
         if (groupIdx < sortedGroups.length && standaloneIdx < standalone.length) {
             // Выбираем элемент с большей инициативой
@@ -838,7 +839,7 @@ function renderBattle() {
             displayItems.push({ type: 'standalone', data: standalone[standaloneIdx++] });
         }
     }
-    
+
     // Отображаем все элементы в правильном порядке
     displayItems.forEach(item => {
         if (item.type === 'group') {
@@ -847,7 +848,7 @@ function renderBattle() {
                 const memberIndex = state.battle.participants.findIndex(c => c.id === member.id);
                 return memberIndex === state.battle.currentTurn;
             });
-            
+
             const groupElement = createGroupElement(group, isActive);
             list.appendChild(groupElement);
         } else {
@@ -857,12 +858,12 @@ function renderBattle() {
             list.appendChild(creatureElement);
         }
     });
-    
+
     // Обновляем детали выбранного существа
     if (state.currentCreature !== null) {
         renderCreatureDetails();
     }
-    
+
     updateBattleStats();
     updateRoundDisplay();
 }
@@ -873,18 +874,18 @@ function createInitiativeItem(creature, isActive) {
     div.className = `initiative-item ${isActive ? 'active' : ''}`;
     div.setAttribute('data-index', creature.index);
     div.setAttribute('draggable', 'true');
-    
+
     // Drag & Drop события
     div.addEventListener('dragstart', handleDragStart);
     div.addEventListener('dragover', handleDragOver);
     div.addEventListener('drop', handleDrop);
     div.addEventListener('dragend', handleDragEnd);
-    
+
     // Полоска HP
-const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
-    const tempHPPercentage = creature.tempHP > 0 ? 
+    const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
+    const tempHPPercentage = creature.tempHP > 0 ?
         Math.min(100, (creature.tempHP / creature.maxHP) * 100) : 0;
-    
+
     div.innerHTML = `
         <div class="initiative-score">
             ${creature.initiative}
@@ -906,13 +907,23 @@ const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
             <div class="creature-stats">
                 <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
                 <span>🛡️ ${creature.ac}</span>
-                ${creature.tempHP > 0 ? 
-                    `<span class="temp-hp-display">🛡️✨ ${creature.tempHP}</span>` : ''}
+                ${creature.tempHP > 0 ?
+            `<span class="temp-hp-display">🛡️✨ ${creature.tempHP}</span>` : ''}
             </div>
             <div class="conditions">
-                ${creature.conditions.map(c => 
-                    `<span class="condition">${c.name} (${c.duration})</span>`
-                ).join('')}
+                ${creature.conditions.map(c =>
+                `<span class="condition-badge ${c.name}" title="${getConditionName(c.name)} (${c.duration} ходов)">${getConditionName(c.name).substring(0, 3)} ${c.duration}</span>`
+            ).join('')}
+                ${creature.usedLegendaryActions > 0 ?
+            `<span class="condition-badge" style="background: #f39c12; color: white;" title="Использовано легендарных действий: ${creature.usedLegendaryActions}">
+                        ⚡ ${creature.usedLegendaryActions}
+                    </span>` : ''
+        }
+                ${creature.usedLairActions ?
+            `<span class="condition-badge" style="background: #7f8c8d; color: white;" title="Действие логова использовано">
+                        🏔️
+                    </span>` : ''
+        }
             </div>
         </div>
         <div>
@@ -936,15 +947,15 @@ function createGroupElement(group, isActive) {
     groupElement.className = `initiative-item ${isActive ? 'active' : ''}`;
     groupElement.setAttribute('data-group-id', group.id);
     groupElement.setAttribute('draggable', 'true');
-    
+
     // Drag & Drop события
     groupElement.addEventListener('dragstart', handleDragStart);
     groupElement.addEventListener('dragover', handleDragOver);
     groupElement.addEventListener('drop', handleDrop);
     groupElement.addEventListener('dragend', handleDragEnd);
-    
+
     const aliveCount = group.members.filter(m => m.currentHP > 0).length;
-    
+
     groupElement.innerHTML = `
         <div class="initiative-score">
             ${group.initiative}
@@ -969,21 +980,21 @@ function createGroupElement(group, isActive) {
             </button>
         </div>
     `;
-    
+
     // Отображаем членов группы, если группа раскрыта
     if (group.isExpanded) {
         const membersContainer = document.createElement('div');
         membersContainer.className = 'group-members';
-        
+
         // Добавляем drop-зону перед членами группы
         const groupDropZone = document.createElement('div');
         groupDropZone.className = 'group-drop-zone';
         groupDropZone.innerHTML = 'Перетащите существо сюда, чтобы добавить в группу';
         groupDropZone.addEventListener('dragover', handleDragOver);
         groupDropZone.addEventListener('drop', (e) => handleDropToGroup(e, group.id));
-        
+
         membersContainer.appendChild(groupDropZone);
-        
+
         group.members.forEach(member => {
             const memberIndex = state.battle.participants.findIndex(c => c.id === member.id);
             if (memberIndex !== -1) {
@@ -991,17 +1002,17 @@ function createGroupElement(group, isActive) {
                 memberElement.className = `group-member ${memberIndex === state.battle.currentTurn ? 'active' : ''}`;
                 memberElement.setAttribute('data-index', memberIndex);
                 memberElement.setAttribute('draggable', 'true');
-                
+
                 memberElement.addEventListener('dragstart', handleDragStart);
                 memberElement.addEventListener('dragover', handleDragOver);
                 memberElement.addEventListener('drop', handleDrop);
                 memberElement.addEventListener('dragend', handleDragEnd);
-                
+
                 // Полоска HP для члена группы
                 const hpPercentage = Math.max(0, (member.currentHP / member.maxHP) * 100);
-                const tempHPPercentage = member.tempHP > 0 ? 
+                const tempHPPercentage = member.tempHP > 0 ?
                     Math.min(100, (member.tempHP / member.maxHP) * 100) : 0;
-                
+
                 memberElement.innerHTML = `
                     <div style="flex: 1;">
                         <div class="creature-name">
@@ -1016,9 +1027,16 @@ function createGroupElement(group, isActive) {
                         </div>
                         <div class="hp-display">
                             <span>❤️ ${member.currentHP}/${member.maxHP}</span>
-                            ${member.tempHP > 0 ? 
-                                `<span class="temp-hp-display" style="font-size: 0.7rem;">🛡️✨ ${member.tempHP}</span>` : ''}
-                            ${member.concentration ? ' ✨' : ''}
+                            ${member.tempHP > 0 ?
+                        `<span class="temp-hp-display" style="background: rgba(243, 156, 18, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold;">
+                                    🛡️ ${member.tempHP}
+                                </span>` : ''
+                    }
+                            ${member.conditions.some(c => c.name === 'concentration') ?
+                        `<span style="background: rgba(155, 89, 182, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold; color: #9b59b6;">
+                                    ✨ Концентрация
+                                </span>` : ''
+                    }
                         </div>
                     </div>
                     <div>
@@ -1033,11 +1051,38 @@ function createGroupElement(group, isActive) {
                 membersContainer.appendChild(memberElement);
             }
         });
-        
+
         groupElement.appendChild(membersContainer);
     }
-    
+
     return groupElement;
+}
+
+// Функция для обновления отображения существ в группе
+function updateGroupMemberDisplay(memberIndex) {
+    const creature = state.battle.participants[memberIndex];
+    if (!creature.groupId) return;
+
+    // Находим элемент группы
+    const groupElement = document.querySelector(`[data-group-id="${creature.groupId}"]`);
+    if (!groupElement || !groupElement.classList.contains('expanded')) return;
+
+    // Находим элемент члена группы
+    const memberElement = groupElement.querySelector(`.group-member[data-index="${memberIndex}"]`);
+    if (!memberElement) return;
+
+    // Обновляем отображение
+    const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
+
+    memberElement.querySelector('.hp-bar').style.width = `${hpPercentage}%`;
+    memberElement.querySelector('.hp-display').innerHTML = `
+        <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
+        ${creature.conditions.some(c => c.name === 'concentration') ?
+            `<span style="background: rgba(155, 89, 182, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold; color: #9b59b6;">
+                ✨ Концентрация
+            </span>` : ''
+        }
+    `;
 }
 
 // ============ DRAG & DROP ============
@@ -1045,9 +1090,9 @@ function createGroupElement(group, isActive) {
 function handleDragStart(e) {
     const item = e.target.closest('.initiative-item, .group-member');
     if (!item) return;
-    
+
     state.dragItem = item;
-    
+
     if (item.classList.contains('group-member')) {
         const index = parseInt(item.getAttribute('data-index'));
         state.dragType = 'creature';
@@ -1075,12 +1120,12 @@ function handleDragStart(e) {
             }));
         }
     }
-    
+
     // Добавляем класс dragging
     setTimeout(() => {
         item.classList.add('dragging');
     }, 0);
-    
+
     // Активируем drop-зоны
     document.getElementById('ungroup-drop-zone').classList.add('active');
 }
@@ -1088,7 +1133,7 @@ function handleDragStart(e) {
 function handleDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    
+
     const dropZone = e.target.closest('.drop-zone, .group-drop-zone');
     if (dropZone) {
         dropZone.classList.add('active');
@@ -1097,14 +1142,14 @@ function handleDragOver(e) {
 
 function handleDrop(e) {
     e.preventDefault();
-    
+
     // Убираем активные классы с drop-зон
     document.getElementById('ungroup-drop-zone').classList.remove('active');
     document.querySelectorAll('.group-drop-zone.active').forEach(z => z.classList.remove('active'));
-    
+
     try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        
+
         if (data.type === 'creature') {
             const targetItem = e.target.closest('.initiative-item');
             if (targetItem) {
@@ -1122,10 +1167,10 @@ function handleDrop(e) {
 
 function handleDropToGroup(e, groupId) {
     e.preventDefault();
-    
+
     try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        
+
         if (data.type === 'creature') {
             addCreatureToGroup(data.index, groupId);
         }
@@ -1136,10 +1181,10 @@ function handleDropToGroup(e, groupId) {
 
 function handleDropToUngroup(e) {
     e.preventDefault();
-    
+
     try {
         const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-        
+
         if (data.type === 'creature') {
             ungroupCreature(data.index);
         }
@@ -1153,11 +1198,11 @@ function handleDragEnd(e) {
     if (state.dragItem) {
         state.dragItem.classList.remove('dragging');
     }
-    
+
     // Убираем активные классы с drop-зон
     document.getElementById('ungroup-drop-zone').classList.remove('active');
     document.querySelectorAll('.group-drop-zone.active').forEach(z => z.classList.remove('active'));
-    
+
     // Сбрасываем состояние drag
     state.dragItem = null;
     state.dragType = null;
@@ -1168,22 +1213,22 @@ function handleDragEnd(e) {
 function addCreatureToGroup(creatureIndex, targetGroupId) {
     const creature = state.battle.participants[creatureIndex];
     if (!creature || creature.groupId === targetGroupId) return;
-    
+
     const oldGroupId = creature.groupId;
     const targetGroup = state.battle.participants.find(c => c.groupId === targetGroupId);
     const newGroupName = targetGroup ? targetGroup.baseName : 'Группа';
-    
+
     // Находим максимальный номер в группе
     const groupMembers = state.battle.participants.filter(c => c.groupId === targetGroupId);
     const maxGroupNumber = groupMembers.reduce((max, c) => Math.max(max, c.groupNumber || 0), 0);
-    
+
     creature.groupId = targetGroupId;
     creature.groupNumber = maxGroupNumber + 1;
     creature.groupName = `Группа "${newGroupName}"`;
     creature.baseName = newGroupName;
-    
+
     addToLog(`${creature.name} перемещен в группу "${newGroupName}"`);
-    
+
     // Если существо было в другой группе, проверяем, не пустая ли теперь старая группа
     if (oldGroupId) {
         const oldGroupCount = state.battle.participants.filter(c => c.groupId === oldGroupId).length;
@@ -1193,7 +1238,7 @@ function addCreatureToGroup(creatureIndex, targetGroupId) {
             addToLog(`Группа удалена (пустая)`);
         }
     }
-    
+
     renderBattle();
     saveToLocalStorage();
 }
@@ -1202,16 +1247,16 @@ function addCreatureToGroup(creatureIndex, targetGroupId) {
 function ungroupCreature(index) {
     const creature = state.battle.participants[index];
     if (!creature || !creature.groupId) return;
-    
+
     const oldGroupId = creature.groupId;
-    
+
     creature.groupId = null;
     creature.groupName = null;
     creature.groupNumber = 0;
     creature.baseName = creature.name;
-    
+
     addToLog(`${creature.name} выведен из группы`);
-    
+
     // Проверяем, не пустая ли теперь старая группа
     const oldGroupCount = state.battle.participants.filter(c => c.groupId === oldGroupId).length;
     if (oldGroupCount === 0) {
@@ -1219,7 +1264,7 @@ function ungroupCreature(index) {
         delete state.battle.groups[oldGroupId];
         addToLog(`Группа удалена (пустая)`);
     }
-    
+
     renderBattle();
     saveToLocalStorage();
 }
@@ -1235,11 +1280,11 @@ function removeFromBattle(index) {
     if (confirm('Удалить это существо из боя?')) {
         const creature = state.battle.participants[index];
         const groupId = creature.groupId;
-        
+
         state.battle.participants.splice(index, 1);
-        
+
         addToLog(`${creature.name} удалён из боя`);
-        
+
         // Если существо было в группе, проверяем, не пустая ли теперь группа
         if (groupId) {
             const groupCount = state.battle.participants.filter(c => c.groupId === groupId).length;
@@ -1249,17 +1294,17 @@ function removeFromBattle(index) {
                 addToLog(`Группа удалена (пустая)`);
             }
         }
-        
+
         if (state.currentCreature === index) {
             state.currentCreature = null;
         } else if (state.currentCreature > index) {
             state.currentCreature--;
         }
-        
+
         if (state.battle.currentTurn >= state.battle.participants.length) {
             state.battle.currentTurn = Math.max(0, state.battle.participants.length - 1);
         }
-        
+
         renderBattle();
         updateContextCreatures();
         saveToLocalStorage();
@@ -1270,7 +1315,7 @@ function removeFromBattle(index) {
 function editCreatureInitiative(index) {
     const creature = state.battle.participants[index];
     if (!creature) return;
-    
+
     state.editInitiativeIndex = index;
     document.getElementById('edit-initiative').value = creature.initiative;
     showModal('initiative-modal');
@@ -1280,7 +1325,7 @@ function editCreatureInitiative(index) {
 function editGroupInitiative(groupId) {
     const groupMembers = state.battle.participants.filter(p => p.groupId === groupId);
     if (groupMembers.length === 0) return;
-    
+
     state.editInitiativeIndex = groupId;
     document.getElementById('edit-initiative').value = groupMembers[0].initiative;
     showModal('initiative-modal');
@@ -1289,7 +1334,7 @@ function editGroupInitiative(groupId) {
 // Сохранение инициативы
 function saveInitiative() {
     if (state.editInitiativeIndex === null) return;
-    
+
     const newInitiative = parseInt(document.getElementById('edit-initiative').value);
     if (!isNaN(newInitiative)) {
         // Если редактируем группу
@@ -1305,7 +1350,7 @@ function saveInitiative() {
             // Редактируем отдельное существо
             const creature = state.battle.participants[state.editInitiativeIndex];
             creature.initiative = newInitiative;
-            
+
             // Если это член группы, обновляем инициативу у всех членов
             if (creature.groupId) {
                 state.battle.participants.forEach(c => {
@@ -1314,15 +1359,15 @@ function saveInitiative() {
                     }
                 });
             }
-            
+
             addToLog(`Инициатива ${creature.name} изменена на ${newInitiative}`);
         }
-        
+
         sortInitiative();
         renderBattle();
         saveToLocalStorage();
     }
-    
+
     closeModal('initiative-modal');
     state.editInitiativeIndex = null;
 }
@@ -1342,10 +1387,10 @@ function renderCreatureDetails() {
         document.getElementById('creature-details').innerHTML = '<div class="empty-state">Существо не найдено</div>';
         return;
     }
-    
-    const isGroupMember = creature.groupId && 
+
+    const isGroupMember = creature.groupId &&
         state.battle.participants.filter(p => p.groupId === creature.groupId).length > 1;
-    
+
     let html = `
         <div class="stat-block">
             <div class="creature-header">
@@ -1442,12 +1487,91 @@ function renderCreatureDetails() {
                 <button onclick="rollDamage()" class="btn btn-danger">
                     <i class="fas fa-bolt"></i> Урон
                 </button>
+                <button onclick="showConditionModal()" class="btn btn-primary">
+                    <i class="fas fa-exclamation-triangle"></i> Состояния
+                </button>
+                <button onclick="toggleConcentration()" class="btn btn-info">
+                    <i class="fas fa-brain"></i> ${creature.conditions.some(c => c.name === 'concentration') ? 'Сбросить концентрацию' : 'Концентрация'}
+                </button>
                 <button onclick="showEditCreatureModal(${state.currentCreature})" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Редактировать
                 </button>
             </div>
     `;
-    
+
+    if (creature.conditions.length > 0) {
+        html += `
+            <div class="section">
+                <h5><i class="fas fa-exclamation-triangle"></i> Активные состояния</h5>
+                <div class="conditions-grid">
+                    ${creature.conditions.map(cond => `
+                        <div class="condition-with-controls">
+                            <div>
+                                <span class="condition-badge ${cond.name}">
+                                    ${getConditionName(cond.name)}
+                                </span>
+                            </div>
+                            <div class="condition-duration">
+                                <button onclick="changeConditionDuration('${cond.id}', -1)" 
+                                        class="condition-duration-btn" title="Уменьшить длительность">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span style="min-width: 30px; text-align: center; font-weight: bold;">
+                                    ${cond.duration}
+                                </span>
+                                <button onclick="changeConditionDuration('${cond.id}', 1)" 
+                                        class="condition-duration-btn" title="Увеличить длительность">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button onclick="removeCondition('${cond.id}')" 
+                                        class="btn btn-xs btn-danger" style="margin-left: 5px; padding: 2px 6px;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // Легендарные действия
+    if (creature.legendaryActions && creature.legendaryActions.length > 0) {
+        const maxLegendaryActions = 3;
+        const remainingActions = maxLegendaryActions - creature.usedLegendaryActions;
+
+        html += `
+            <div class="legendary-actions-container">
+                <h5><i class="fas fa-crown"></i> Легендарные действия</h5>
+                <div class="legendary-actions-counter">
+                    <span><strong>Использовано в этом раунде:</strong> ${creature.usedLegendaryActions}/${maxLegendaryActions}</span>
+                    <div class="legendary-counter">
+                        ${Array.from({ length: maxLegendaryActions }, (_, i) => `
+                            <span class="legendary-dot ${i < creature.usedLegendaryActions ? 'used' : 'available'}"></span>
+                        `).join('')}
+                    </div>
+                    ${remainingActions > 0 ?
+                `<button onclick="resetLegendaryActionsForCreature(${state.currentCreature})" 
+                                class="btn btn-sm btn-warning">
+                            <i class="fas fa-redo"></i> Сбросить
+                        </button>` : ''
+            }
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    ${creature.legendaryActions.map((action, idx) => `
+                        <button onclick="useLegendaryAction(${idx})" 
+                                class="legendary-action-btn ${creature.usedLegendaryActions >= maxLegendaryActions ? 'legendary-action-used' : ''}"
+                                ${creature.usedLegendaryActions >= maxLegendaryActions ? 'disabled' : ''}>
+                            <span>${action}</span>
+                            <span><i class="fas fa-bolt"></i></span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
     // Урон и тип урона
     html += `
         <div class="section">
@@ -1463,26 +1587,7 @@ function renderCreatureDetails() {
             ` : ''}
         </div>
     `;
-    
-    // Состояния
-    if (creature.conditions.length > 0) {
-        html += `
-            <div class="section">
-                <h5><i class="fas fa-exclamation-triangle"></i> Состояния</h5>
-                <div class="conditions">
-                    ${creature.conditions.map((cond, idx) => `
-                        <span class="condition">
-                            ${cond.name} (${cond.duration})
-                            <button onclick="removeCondition(${idx})" class="btn btn-xs">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </span>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
+
     // Резисты/Иммунитеты/Уязвимости
     if (creature.resistances.length > 0 || creature.immunities.length > 0 || creature.vulnerabilities.length > 0) {
         html += `
@@ -1490,48 +1595,32 @@ function renderCreatureDetails() {
                 <h5><i class="fas fa-shield-alt"></i> Защита</h5>
                 <div class="damage-modifiers">
         `;
-        
+
         if (creature.resistances.length > 0) {
-            html += creature.resistances.map(r => 
+            html += creature.resistances.map(r =>
                 `<span class="damage-mod resistance">${r}</span>`
             ).join('');
         }
-        
+
         if (creature.immunities.length > 0) {
-            html += creature.immunities.map(i => 
+            html += creature.immunities.map(i =>
                 `<span class="damage-mod immunity">${i}</span>`
             ).join('');
         }
-        
+
         if (creature.vulnerabilities.length > 0) {
-            html += creature.vulnerabilities.map(v => 
+            html += creature.vulnerabilities.map(v =>
                 `<span class="damage-mod vulnerability">${v}</span>`
             ).join('');
         }
-        
+
         html += `
                 </div>
             </div>
         `;
     }
-    
+
     // Легендарные действия
-    if (creature.legendaryActions && creature.legendaryActions.length > 0) {
-        html += `
-            <div class="section">
-                <h5><i class="fas fa-crown"></i> Легендарные действия</h5>
-                <div class="legendary-actions-list">
-                    ${creature.legendaryActions.map((action, idx) => `
-                        <div class="action-item">
-                            ${action}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    // Действия логова
     if (creature.lairActions && creature.lairActions.length > 0) {
         html += `
             <div class="section">
@@ -1540,13 +1629,22 @@ function renderCreatureDetails() {
                     ${creature.lairActions.map((action, idx) => `
                         <div class="action-item">
                             ${action}
+                            ${!creature.usedLairActions ?
+                `<button onclick="useLairAction(${state.currentCreature}, ${idx})" 
+                                        class="btn btn-sm btn-success" style="margin-top: 5px;">
+                                    <i class="fas fa-play"></i> Использовать
+                                </button>` :
+                `<span class="btn btn-sm btn-secondary disabled" style="margin-top: 5px;">
+                                    <i class="fas fa-check"></i> Использовано
+                                </span>`
+            }
                         </div>
                     `).join('')}
                 </div>
             </div>
         `;
     }
-    
+
     // Кнопка изменения цвета
     html += `
         <div class="section">
@@ -1560,7 +1658,7 @@ function renderCreatureDetails() {
             </div>
         </div>
     `;
-    
+
     // Информация о группе
     if (isGroupMember) {
         html += `
@@ -1574,10 +1672,110 @@ function renderCreatureDetails() {
             </div>
         `;
     }
-    
+
     html += `</div>`;
-    
+
     document.getElementById('creature-details').innerHTML = html;
+}
+
+// ============ ЛЕГЕНДАРНЫЕ ДЕЙСТВИЯ ============
+
+// Функция для использования легендарного действия
+function useLegendaryAction(actionIndex) {
+    const creature = state.battle.participants[state.currentCreature];
+    if (!creature || !creature.legendaryActions || !creature.legendaryActions[actionIndex]) return;
+
+    // Проверяем, не использованы ли все легендарные действия в этом раунде
+    const maxLegendaryActions = 3; // Стандартное количество для D&D 5e
+
+    if (creature.usedLegendaryActions >= maxLegendaryActions) {
+        addToLog(`${creature.name} уже использовал все легендарные действия в этом раунде`);
+        return;
+    }
+
+    const action = creature.legendaryActions[actionIndex];
+    creature.usedLegendaryActions++;
+
+    // Добавляем действие в историю
+    addToLog(`⚡ ${creature.name} использует легендарное действие: ${action}`);
+
+    // Обновляем отображение
+    renderCreatureDetails();
+    saveToLocalStorage();
+
+    // Если это было последнее легендарное действие
+    if (creature.usedLegendaryActions >= maxLegendaryActions) {
+        addToLog(`${creature.name} использовал все легендарные действия в этом раунде`);
+    }
+}
+
+// Сброс легендарных действий в начале нового раунда
+function resetLegendaryActions() {
+    state.battle.participants.forEach(creature => {
+        creature.usedLegendaryActions = 0;
+        creature.usedLairActions = false;
+    });
+}
+
+// Обновим функцию newRound для сброса легендарных действий:
+function newRound() {
+    saveBattleStateToHistory();
+
+    state.battle.round++;
+    state.battle.currentTurn = 0;
+
+    // Уменьшаем длительность всех состояний у всех существ
+    state.battle.participants.forEach(creature => {
+        creature.conditions = creature.conditions.filter(cond => {
+            cond.duration--;
+            return cond.duration > 0;
+        });
+    });
+
+    // Сбрасываем легендарные действия
+    resetLegendaryActions();
+
+    updateRoundDisplay();
+    saveToLocalStorage();
+    addToLog(`=== Начало раунда ${state.battle.round} ===`);
+
+    renderBattle();
+
+    const currentCreature = state.battle.participants[state.battle.currentTurn];
+    if (currentCreature) {
+        addToLog(`Ход: ${currentCreature.name}`);
+    }
+}
+
+// Функция для сброса легендарных действий конкретного существа
+function resetLegendaryActionsForCreature(index) {
+    const creature = state.battle.participants[index];
+    if (!creature) return;
+
+    creature.usedLegendaryActions = 0;
+    addToLog(`${creature.name}: легендарные действия сброшены`);
+
+    renderCreatureDetails();
+    saveToLocalStorage();
+}
+
+// Функция для использования действия логова
+function useLairAction(index, actionIndex) {
+    const creature = state.battle.participants[index];
+    if (!creature || !creature.lairActions || !creature.lairActions[actionIndex]) return;
+
+    if (creature.usedLairActions) {
+        addToLog(`${creature.name} уже использовал действие логова в этом раунде`);
+        return;
+    }
+
+    const action = creature.lairActions[actionIndex];
+    creature.usedLairActions = true;
+
+    addToLog(`🏔️ ${creature.name} использует действие логова: ${action}`);
+
+    renderCreatureDetails();
+    saveToLocalStorage();
 }
 
 // ============ ВРЕМЕННЫЕ ХИТЫ ============
@@ -1585,7 +1783,7 @@ function renderCreatureDetails() {
 function showTempHPModal() {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
-    
+
     document.getElementById('current-temp-hp').textContent = creature.tempHP;
     document.getElementById('temp-hp-amount').value = Math.max(5, creature.tempHP + 5);
     showModal('temp-hp-modal');
@@ -1594,19 +1792,19 @@ function showTempHPModal() {
 function applyTempHP() {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
-    
+
     const amount = parseInt(document.getElementById('temp-hp-amount').value);
     const action = document.getElementById('temp-hp-action').value;
-    
+
     if (isNaN(amount) || amount < 0) {
         alert('Введите корректное количество');
         return;
     }
-    
+
     let newTempHP = creature.tempHP;
     let message = '';
-    
-    switch(action) {
+
+    switch (action) {
         case 'set':
             newTempHP = amount;
             message = `Временные HP установлены на ${amount}`;
@@ -1628,10 +1826,10 @@ function applyTempHP() {
             message = `Временные HP удалены`;
             break;
     }
-    
+
     creature.tempHP = newTempHP;
     addToLog(`${creature.name}: ${message}`);
-    
+
     closeModal('temp-hp-modal');
     renderBattle();
     renderCreatureDetails();
@@ -1641,7 +1839,7 @@ function applyTempHP() {
 function addTempHP(amount, action = 'add') {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
-    
+
     if (action === 'add') {
         creature.tempHP += amount;
         addToLog(`${creature.name} получил ${amount} временных HP`);
@@ -1651,7 +1849,9 @@ function addTempHP(amount, action = 'add') {
             addToLog(`${creature.name} получил ${amount} временных HP (заменил старые)`);
         }
     }
-    
+    if (creature.groupId) {
+        updateGroupMemberDisplay(state.currentCreature);
+    }
     renderBattle();
     renderCreatureDetails();
     saveToLocalStorage();
@@ -1660,10 +1860,10 @@ function addTempHP(amount, action = 'add') {
 function clearTempHP() {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
-    
+
     creature.tempHP = 0;
     addToLog(`${creature.name} потерял все временные HP`);
-    
+
     renderBattle();
     renderCreatureDetails();
     saveToLocalStorage();
@@ -1674,9 +1874,9 @@ function clearTempHP() {
 function showEditCreatureModal(index) {
     const creature = state.battle.participants[index];
     if (!creature) return;
-    
+
     state.editCreatureIndex = index;
-    
+
     // Заполняем форму данными существа
     document.getElementById('edit-name').value = creature.name;
     document.getElementById('edit-ac').value = creature.ac;
@@ -1690,7 +1890,7 @@ function showEditCreatureModal(index) {
     document.getElementById('edit-legendary-actions').value = creature.legendaryActions ? creature.legendaryActions.join('|') : '';
     document.getElementById('edit-lair-actions').value = creature.lairActions ? creature.lairActions.join('|') : '';
     document.getElementById('edit-color').value = creature.color;
-    
+
     // Выбираем правильный цвет в пикере
     document.querySelectorAll('#color-picker .color-option').forEach(opt => {
         opt.classList.remove('selected');
@@ -1698,18 +1898,18 @@ function showEditCreatureModal(index) {
             opt.classList.add('selected');
         }
     });
-    
+
     showModal('edit-creature-modal');
 }
 
 function saveCreatureEdit() {
     if (state.editCreatureIndex === null) return;
-    
+
     const creature = state.battle.participants[state.editCreatureIndex];
     if (!creature) return;
-    
+
     const oldName = creature.name;
-    
+
     // Сохраняем изменения (кроме HP и инициативы)
     creature.name = document.getElementById('edit-name').value.trim() || creature.name;
     creature.ac = parseInt(document.getElementById('edit-ac').value) || creature.ac;
@@ -1723,12 +1923,12 @@ function saveCreatureEdit() {
     creature.legendaryActions = parseActions(document.getElementById('edit-legendary-actions').value);
     creature.lairActions = parseActions(document.getElementById('edit-lair-actions').value);
     creature.color = document.getElementById('edit-color').value;
-    
+
     addToLog(`Существо "${oldName}" отредактировано`);
-    
+
     closeModal('edit-creature-modal');
     state.editCreatureIndex = null;
-    
+
     renderBattle();
     renderCreatureDetails();
     saveToLocalStorage();
@@ -1737,7 +1937,7 @@ function saveCreatureEdit() {
 function changeCreatureColor(index, color = null) {
     const creature = state.battle.participants[index];
     if (!creature) return;
-    
+
     if (!color) {
         // Если цвет не передан, показываем выбор
         const newColor = prompt('Введите цвет в формате HEX (например, #3498db):', creature.color);
@@ -1749,7 +1949,7 @@ function changeCreatureColor(index, color = null) {
     } else {
         creature.color = color;
     }
-    
+
     renderBattle();
     if (state.currentCreature === index) {
         renderCreatureDetails();
@@ -1763,16 +1963,16 @@ function changeCreatureColor(index, color = null) {
 function applyDamage() {
     const amount = parseInt(document.getElementById('damage-amount').value);
     const type = document.getElementById('damage-type').value;
-    
+
     if (isNaN(amount)) {
         alert('Введите корректное количество');
         return;
     }
-    
+
     if (state.currentCreature !== null) {
         const creature = state.battle.participants[state.currentCreature];
         let damageAmount = Math.abs(amount);
-        
+
         // Учитываем резисты/иммунитеты/уязвимости
         if (type !== 'healing') {
             if (creature.immunities && creature.immunities.includes(type)) {
@@ -1786,7 +1986,7 @@ function applyDamage() {
                 addToLog(`${creature.name} уязвим к ${type} (двойной урон)`);
             }
         }
-        
+
         if (type === 'healing') {
             // Лечение не восстанавливает временные хиты
             creature.currentHP += damageAmount;
@@ -1798,14 +1998,14 @@ function applyDamage() {
                 const damageToTemp = Math.min(damageAmount, creature.tempHP);
                 creature.tempHP -= damageToTemp;
                 damageAmount -= damageToTemp;
-                
+
                 addToLog(`${creature.name} потерял ${damageToTemp} временных HP`);
-                
+
                 if (damageAmount <= 0) {
                     addToLog(`Урон полностью поглощен временными HP`);
                 }
             }
-            
+
             // Оставшийся урон идет на обычные хиты
             if (damageAmount > 0) {
                 creature.currentHP -= damageAmount;
@@ -1813,60 +2013,181 @@ function applyDamage() {
                 addToLog(`${creature.name} получил ${damageAmount} урона (${type})`);
             }
         }
-        
+
         // Проверка на смерть
         if (creature.currentHP <= 0) {
             addToLog(`💀 ${creature.name} погиб!`);
         }
-        
+
+        // После применения урона проверяем концентрацию
+        if (type !== 'healing' && damageAmount > 0 && creature.conditions.some(c => c.name === 'concentration')) {
+            // Бросок на поддержание концентрации (сложность 10 или половина урона, что больше)
+            const concentrationDC = Math.max(10, Math.floor(damageAmount / 2));
+            const concentrationRoll = Math.floor(Math.random() * 20) + 1;
+            const conBonus = Math.floor((creature.attackBonus || 0) / 2); // Примерный бонус
+
+            if (concentrationRoll + conBonus < concentrationDC) {
+                // Концентрация сбита
+                creature.conditions = creature.conditions.filter(c => c.name !== 'concentration');
+                addToLog(`${creature.name} потерял концентрацию (бросок: ${concentrationRoll + conBonus} против СЛ ${concentrationDC})`);
+            } else {
+                addToLog(`${creature.name} сохранил концентрацию (бросок: ${concentrationRoll + conBonus} против СЛ ${concentrationDC})`);
+            }
+        }
+
+        if (creature.groupId) {
+            updateGroupMemberDisplay(state.currentCreature);
+        }
+
         saveToLocalStorage();
         renderBattle();
         renderCreatureDetails();
     }
-    
+
     closeModal('damage-modal');
 }
 
 // Добавление состояния
 function addCondition() {
     if (state.currentCreature === null) return;
-    
+
     const name = document.getElementById('condition-select').value;
     const duration = parseInt(document.getElementById('condition-duration').value);
     const creature = state.battle.participants[state.currentCreature];
-    
+
     if (isNaN(duration) || duration < 1) {
         alert('Введите корректную длительность');
         return;
     }
-    
+
     // Проверяем, есть ли уже такое состояние
     const existingIndex = creature.conditions.findIndex(c => c.name === name);
     if (existingIndex !== -1) {
+        // Если состояние уже есть, обновляем длительность
         creature.conditions[existingIndex].duration = duration;
+        addToLog(`${creature.name}: длительность состояния "${name}" обновлена на ${duration} ходов`);
     } else {
-        creature.conditions.push({ name, duration });
+        // Добавляем новое состояние с id для лучшего управления
+        const conditionId = `cond_${Date.now()}`;
+        creature.conditions.push({
+            id: conditionId,
+            name,
+            duration,
+            type: name,
+            appliedRound: state.battle.round,
+            appliedTurn: state.battle.currentTurn
+        });
+        addToLog(`${creature.name} получил состояние: ${getConditionName(name)} на ${duration} ходов`);
     }
-    
-    addToLog(`${creature.name} получил состояние: ${name} на ${duration} ходов`);
-    
+
+    if (creature.groupId) {
+        updateGroupMemberDisplay(state.currentCreature);
+    }
+
     closeModal('condition-modal');
     saveToLocalStorage();
     renderCreatureDetails();
+    renderBattle();
+}
+
+// Функция для получения читаемого имени состояния
+function getConditionName(conditionKey) {
+    const conditionNames = {
+        'blinded': 'Ослеплён',
+        'charmed': 'Очарован',
+        'frightened': 'Испуган',
+        'grappled': 'Схвачен',
+        'paralyzed': 'Парализован',
+        'petrified': 'Окаменевший',
+        'poisoned': 'Отравлен',
+        'prone': 'Лежит',
+        'restrained': 'Скован',
+        'stunned': 'Оглушён',
+        'unconscious': 'Бессознателен',
+        'invisible': 'Невидим',
+        'concentration': 'Концентрация'
+    };
+    return conditionNames[conditionKey] || conditionKey;
 }
 
 // Удаление состояния
-function removeCondition(conditionIndex) {
+function removeCondition(conditionId) {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
-    
-    const conditionName = creature.conditions[conditionIndex].name;
-    creature.conditions.splice(conditionIndex, 1);
-    addToLog(`${creature.name} больше не ${conditionName}`);
-    
-    saveToLocalStorage();
-    renderCreatureDetails();
+
+    const conditionIndex = creature.conditions.findIndex(c => c.id === conditionId);
+    if (conditionIndex !== -1) {
+        const conditionName = getConditionName(creature.conditions[conditionIndex].name);
+        creature.conditions.splice(conditionIndex, 1);
+        addToLog(`${creature.name} больше не ${conditionName}`);
+
+        if (creature.groupId) {
+            updateGroupMemberDisplay(state.currentCreature);
+        }
+        saveToLocalStorage();
+        renderCreatureDetails();
+    }
 }
+
+// Функция изменения длительности состояния
+function changeConditionDuration(conditionId, change) {
+    const creature = state.battle.participants[state.currentCreature];
+    if (!creature) return;
+
+    const condition = creature.conditions.find(c => c.id === conditionId);
+    if (condition) {
+        condition.duration += change;
+
+        if (condition.duration <= 0) {
+            // Автоматическое удаление при нулевой длительности
+            removeCondition(conditionId);
+        } else {
+            const conditionName = getConditionName(condition.name);
+            addToLog(`${creature.name}: длительность "${conditionName}" изменена на ${condition.duration} ходов`);
+            saveToLocalStorage();
+            renderCreatureDetails();
+        }
+    }
+}
+
+// Функция для применения эффектов состояний (можно расширять)
+function applyConditionEffects(creature) {
+    if (!creature.conditions || creature.conditions.length === 0) return;
+
+    let effects = {
+        acModifier: 0,
+        attackModifier: 0,
+        disadvantageOnAttacks: false,
+        advantageOnAttacks: false,
+        speedReduced: false,
+        cantTakeActions: false
+    };
+
+    creature.conditions.forEach(condition => {
+        switch (condition.name) {
+            case 'prone':
+                effects.disadvantageOnAttacks = true;
+                effects.acModifier = -2; // Пример модификатора
+                break;
+            case 'restrained':
+                effects.disadvantageOnAttacks = true;
+                effects.speedReduced = true;
+                break;
+            case 'paralyzed':
+            case 'stunned':
+            case 'unconscious':
+                effects.cantTakeActions = true;
+                effects.acModifier = -5; // Автопопадание по парализованным
+                break;
+            case 'invisible':
+                effects.advantageOnAttacks = true;
+                break;
+        }
+    });
+
+    return effects;
+}
+
 
 // ============ БРОСКИ КУБОВ ============
 
@@ -1874,10 +2195,10 @@ function removeCondition(conditionIndex) {
 function rollDice(dice) {
     const match = dice.match(/d(\d+)/);
     if (!match) return;
-    
+
     const sides = parseInt(match[1]);
     const result = Math.floor(Math.random() * sides) + 1;
-    
+
     const message = `Бросок ${dice}: <strong>${result}</strong>`;
     showRollResult(message);
     addToLog(`Бросок ${dice}: ${result}`);
@@ -1890,7 +2211,7 @@ function rollCustom() {
         alert('Введите выражение для броска');
         return;
     }
-    
+
     try {
         const result = evalDiceExpression(input);
         const message = `<strong>Бросок ${input}: ${result}</strong>`;
@@ -1915,7 +2236,7 @@ function evalDiceExpression(expr) {
         }
         expr = expr.replace(match[0], total);
     }
-    
+
     // Вычисляем оставшееся выражение
     return eval(expr);
 }
@@ -1927,9 +2248,9 @@ function rollMass() {
         alert('Введите выражение для массового броска');
         return;
     }
-    
+
     const result = evalDiceExpression(input);
-    
+
     const message = `Массовый бросок ${input}: <strong>${result}</strong>`;
     showRollResult(message);
     addToLog(`Массовый бросок ${input}: ${result}`);
@@ -1940,10 +2261,10 @@ function rollAdvantage() {
     const roll1 = Math.floor(Math.random() * 20) + 1;
     const roll2 = Math.floor(Math.random() * 20) + 1;
     const result = Math.max(roll1, roll2);
-    
+
     const message = `Преимущество: <strong>${result}</strong><br>
                     <small>${roll1}, ${roll2} (выбран лучший)</small>`;
-    
+
     showRollResult(message, roll1 === 20 || roll2 === 20 ? 'critical' : 'normal');
     addToLog(`Бросок с преимуществом: ${result} (${roll1}, ${roll2})`);
 }
@@ -1952,10 +2273,10 @@ function rollDisadvantage() {
     const roll1 = Math.floor(Math.random() * 20) + 1;
     const roll2 = Math.floor(Math.random() * 20) + 1;
     const result = Math.min(roll1, roll2);
-    
+
     const message = `Помеха: <strong>${result}</strong><br>
                     <small>${roll1}, ${roll2} (выбран худший)</small>`;
-    
+
     showRollResult(message, 'normal');
     addToLog(`Бросок с помехой: ${result} (${roll1}, ${roll2})`);
 }
@@ -1972,19 +2293,19 @@ function rollAttack() {
     const creature = state.battle.participants[state.currentCreature];
     const roll = Math.floor(Math.random() * 20) + 1;
     const total = roll + (creature.attackBonus || 0);
-    
+
     let isCrit = roll === 20;
     let isFumble = roll === 1;
-    
+
     const message = `
         Атака ${creature.name}: <strong>${total}</strong> (${roll} + ${creature.attackBonus})
         ${isCrit ? '<br><span style="color: #e74c3c;">🎯 КРИТИЧЕСКИЙ УДАР!</span>' : ''}
         ${isFumble ? '<br><span style="color: #c0392b;">💥 КРИТИЧЕСКИЙ ПРОВАЛ!</span>' : ''}
     `;
-    
+
     showRollResult(message, isCrit ? 'critical' : isFumble ? 'danger' : 'normal');
     addToLog(`Атака ${creature.name}: ${total} (${roll} + ${creature.attackBonus})`);
-    
+
     // Автоматический бросок урона при критическом ударе
     if (isCrit && creature.damage) {
         setTimeout(() => rollDamage(true), 1000);
@@ -1995,16 +2316,16 @@ function rollAttack() {
 function rollDamage(isCrit = false) {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature.damage) return;
-    
+
     let damageExpr = creature.damage;
-    
+
     // Если крит, удваиваем количество кубов
     if (isCrit) {
         damageExpr = damageExpr.replace(/(\d+)d(\d+)/g, (match, count, sides) => {
             return `${parseInt(count) * 2}d${sides}`;
         });
     }
-    
+
     try {
         const result = evalDiceExpression(damageExpr);
         const message = `<strong>Урон ${creature.name}: ${result} ${creature.damageType}</strong>`;
@@ -2024,7 +2345,7 @@ function resetBattle() {
     if (!confirm('Сбросить бой в начальное состояние?\n\nЭто вернет все HP к максимуму, обнулит временные HP, состояния, и сбросит раунды, но сохранит существ в инициативе.')) {
         return;
     }
-    
+
     // Сохраняем оригинальные данные существ из бестиария для восстановления HP
     const creatureResetMap = {};
     state.creatures.forEach(cr => {
@@ -2039,18 +2360,18 @@ function resetBattle() {
             vulnerabilities: [...(cr.vulnerabilities || [])]
         };
     });
-    
+
     // Восстанавливаем каждого участника боя
     state.battle.participants.forEach(participant => {
         // Находим оригинальное существо в бестиарии
         const original = state.creatures.find(c => c.id === participant.id);
         const resetData = creatureResetMap[participant.id];
-        
+
         if (resetData) {
             // Восстанавливаем HP
             participant.currentHP = resetData.maxHP;
             participant.maxHP = resetData.maxHP;
-            
+
             // Восстанавливаем другие параметры из оригинала
             participant.ac = resetData.ac;
             participant.attackBonus = resetData.attackBonus;
@@ -2067,39 +2388,69 @@ function resetBattle() {
             // Для быстрых NPC используем текущее maxHP
             participant.currentHP = participant.maxHP;
         }
-        
+
         // Сбрасываем временные HP
         participant.tempHP = 0;
-        
+
         // Сбрасываем состояния
         participant.conditions = [];
-        
+
         // Сбрасываем концентрацию
         participant.concentration = false;
-        
+
         // Сбрасываем использованные действия
         participant.usedLegendaryActions = 0;
         participant.usedLairActions = false;
     });
-    
+
     // Сбрасываем раунд и текущий ход
     state.battle.round = 1;
     state.battle.currentTurn = 0;
-    
+
     // Переброс инициативы (опционально, можно закомментировать если нужно сохранить инициативу)
     // rollAllInitiative();
-    
+
     // Очищаем историю боя
     state.battle.log = [];
     document.getElementById('battle-log').innerHTML = '';
-    
+
     // Обновляем отображение
     renderBattle();
     updateRoundDisplay();
     saveToLocalStorage();
-    
+
     addToLog('=== БОЙ СБРОШЕН В НАЧАЛЬНОЕ СОСТОЯНИЕ ===');
     addToLog('Все HP восстановлены, состояния сброшены');
+}
+
+
+// Функция для переключения концентрации
+function toggleConcentration() {
+    const creature = state.battle.participants[state.currentCreature];
+    if (!creature) return;
+
+    const concentrationCondition = creature.conditions.find(c => c.name === 'concentration');
+
+    if (concentrationCondition) {
+        // Снимаем концентрацию
+        creature.conditions = creature.conditions.filter(c => c.name !== 'concentration');
+        addToLog(`${creature.name} потерял концентрацию`);
+    } else {
+        // Добавляем концентрацию
+        creature.conditions.push({
+            id: `cond_${Date.now()}`,
+            name: 'concentration',
+            duration: 999, // Большое число - пока не будет снята
+            type: 'concentration'
+        });
+        addToLog(`${creature.name} сконцентрировался`);
+    }
+    if (creature.groupId) {
+        updateGroupMemberDisplay(state.currentCreature);
+    }
+
+    renderCreatureDetails();
+    saveToLocalStorage();
 }
 
 // ============ БЫСТРЫЙ NPC ============
@@ -2110,7 +2461,7 @@ function showQuickNPCModal() {
     document.getElementById('quick-npc-ac').value = '';
     document.getElementById('quick-npc-initiative').value = '';
     document.getElementById('quick-npc-color').value = '#3498db';
-    
+
     // Сбрасываем цветовой пикер
     document.querySelectorAll('#quick-npc-modal .color-option').forEach(opt => {
         opt.classList.remove('selected');
@@ -2118,7 +2469,7 @@ function showQuickNPCModal() {
             opt.classList.add('selected');
         }
     });
-    
+
     showModal('quick-npc-modal');
 }
 
@@ -2128,11 +2479,11 @@ function addQuickNPC() {
     const ac = parseInt(document.getElementById('quick-npc-ac').value) || 12;
     let initiative = parseInt(document.getElementById('quick-npc-initiative').value);
     const color = document.getElementById('quick-npc-color').value || '#3498db';
-    
+
     if (isNaN(initiative)) {
         initiative = rollInitiative();
     }
-    
+
     const creature = {
         id: Date.now(),
         name: name,
@@ -2155,13 +2506,13 @@ function addQuickNPC() {
         groupNumber: 0,
         color: color
     };
-    
+
     state.battle.participants.push(creature);
     sortInitiative();
     renderBattle();
     updateContextCreatures();
     saveToLocalStorage();
-    
+
     addToLog(`Быстрый NPC "${name}" добавлен в бой`);
     closeModal('quick-npc-modal');
 }
@@ -2169,9 +2520,9 @@ function addQuickNPC() {
 // ============ УПРАВЛЕНИЕ ХОДОМ ============
 
 function nextTurn() {
-    if (state.battle.participants.length === 0) return;    
+    if (state.battle.participants.length === 0) return;
     saveBattleStateToHistory();
-    
+
     const current = state.battle.participants[state.battle.currentTurn];
     if (current) {
         current.conditions = current.conditions.filter(cond => {
@@ -2179,18 +2530,18 @@ function nextTurn() {
             return cond.duration > 0;
         });
     }
-    
+
     // Переходим к следующему существу
     state.battle.currentTurn++;
-    
+
     if (state.battle.currentTurn >= state.battle.participants.length) {
         newRound();
         return;
     }
-    
+
     renderBattle();
     saveToLocalStorage();
-    
+
     const newCurrent = state.battle.participants[state.battle.currentTurn];
     addToLog(`Ход: ${newCurrent ? newCurrent.name : '???'}`);
 }
@@ -2199,7 +2550,7 @@ function nextTurn() {
 
 function previousTurn() {
     if (state.battle.participants.length === 0) return;
-    
+
     // Увеличиваем длительность состояний у текущего существа
     const current = state.battle.participants[state.battle.currentTurn];
     if (current) {
@@ -2207,9 +2558,9 @@ function previousTurn() {
             cond.duration++;
         });
     }
-    
+
     state.battle.currentTurn = (state.battle.currentTurn - 1 + state.battle.participants.length) % state.battle.participants.length;
-    
+
     // Если вернулись к последнему существу - уменьшаем раунд
     if (state.battle.currentTurn === state.battle.participants.length - 1) {
         if (state.battle.round > 1) {
@@ -2217,20 +2568,20 @@ function previousTurn() {
             addToLog(`=== Откат к раунду ${state.battle.round} ===`);
         }
     }
-    
+
     renderBattle();
     saveToLocalStorage();
-    
+
     const newCurrent = state.battle.participants[state.battle.currentTurn];
     addToLog(`Вернулись к: ${newCurrent ? newCurrent.name : '???'}`);
 }
 
 function newRound() {
     saveBattleStateToHistory();
-    
+
     state.battle.round++;
     state.battle.currentTurn = 0;
-    
+
     // Уменьшаем длительность всех состояний у всех существ
     state.battle.participants.forEach(creature => {
         creature.conditions = creature.conditions.filter(cond => {
@@ -2240,11 +2591,11 @@ function newRound() {
         creature.usedLegendaryActions = 0;
         creature.usedLairActions = false;
     });
-    
+
     updateRoundDisplay();
     saveToLocalStorage();
     addToLog(`=== Начало раунда ${state.battle.round} ===`);
-    
+
     renderBattle();
 
     const currentCreature = state.battle.participants[state.battle.currentTurn];
@@ -2264,7 +2615,7 @@ function showModal(modalId) {
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
-    
+
     // Сброс полей
     if (modalId === 'damage-modal') {
         document.getElementById('damage-amount').value = '';
@@ -2290,9 +2641,9 @@ function showConditionModal() {
 function updateContextCreatures() {
     const select = document.getElementById('context-creature');
     if (!select) return;
-    
+
     select.innerHTML = '<option value="">Выберите существо</option>';
-    
+
     state.battle.participants.forEach((creature, index) => {
         const option = document.createElement('option');
         option.value = index;
@@ -2305,18 +2656,18 @@ function contextRoll() {
     const creatureIndex = document.getElementById('context-creature').value;
     const rollType = document.getElementById('context-roll-type').value;
     const skill = document.getElementById('context-skill').value;
-    
+
     if (creatureIndex === '') {
         alert('Выберите существо');
         return;
     }
-    
+
     const creature = state.battle.participants[creatureIndex];
     let roll = Math.floor(Math.random() * 20) + 1;
     let bonus = 0;
     let message = '';
-    
-    switch(rollType) {
+
+    switch (rollType) {
         case 'attack':
             bonus = creature.attackBonus || 0;
             message = `Атака ${creature.name}: ${roll + bonus} (${roll} + ${bonus})`;
@@ -2330,14 +2681,14 @@ function contextRoll() {
             message = `Проверка ${creature.name} (${skill}): ${roll + bonus} (${roll} + ${bonus})`;
             break;
     }
-    
+
     const isCrit = roll === 20;
     const isFumble = roll === 1;
-    
+
     let resultMessage = message;
     if (isCrit) resultMessage += '<br><span style="color: #e74c3c;">🎯 КРИТИЧЕСКИЙ УСПЕХ!</span>';
     if (isFumble) resultMessage += '<br><span style="color: #c0392b;">💥 КРИТИЧЕСКИЙ ПРОВАЛ!</span>';
-    
+
     showRollResult(resultMessage, isCrit ? 'critical' : isFumble ? 'danger' : 'normal');
     addToLog(message);
 }
@@ -2347,15 +2698,15 @@ function contextRoll() {
 function addToLog(message) {
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const entry = `<div class="log-entry">[${timestamp}] ${message}</div>`;
-    
+
     const logContainer = document.getElementById('battle-log');
     logContainer.insertAdjacentHTML('afterbegin', entry);
-    
+
     state.battle.log.unshift(`[${timestamp}] ${message}`);
     if (state.battle.log.length > 100) {
         state.battle.log.pop();
     }
-    
+
     saveToLocalStorage();
 }
 
@@ -2372,13 +2723,13 @@ function clearBattleLog() {
 function updateBattleStats() {
     const stats = document.getElementById('battle-stats');
     if (!stats) return;
-    
+
     const participants = state.battle.participants;
     const alive = participants.filter(c => c.currentHP > 0).length;
     const dead = participants.filter(c => c.currentHP <= 0).length;
     const totalHP = participants.reduce((sum, c) => sum + c.currentHP, 0);
     const avgHP = participants.length > 0 ? Math.round(totalHP / participants.length) : 0;
-    
+
     stats.innerHTML = `
         <div style="margin-bottom: 15px;">
             <div><strong>Всего существ:</strong> ${participants.length}</div>
@@ -2421,12 +2772,12 @@ function clearSession() {
         state.currentCreature = null;
         state.editingCreatureId = null;
         state.editCreatureIndex = null;
-        
+
         renderBattle();
         renderSavedCreatures();
         updateContextCreatures();
         resetCreatureForm();
-        
+
         addToLog('Все данные очищены');
     }
 }
@@ -2442,14 +2793,14 @@ function deleteCreature(creatureId) {
 
 function saveSession() {
     saveToLocalStorage();
-    
+
     const dataStr = JSON.stringify({
         creatures: state.creatures,
         battle: state.battle,
         groups: state.groups,
         timestamp: new Date().toISOString()
     });
-    
+
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportLink = document.createElement('a');
     exportLink.setAttribute('href', dataUri);
@@ -2457,7 +2808,7 @@ function saveSession() {
     document.body.appendChild(exportLink);
     exportLink.click();
     document.body.removeChild(exportLink);
-    
+
     addToLog('Сессия экспортирована в файл');
 }
 
@@ -2465,33 +2816,33 @@ function loadSession() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
-    input.onchange = function(e) {
+
+    input.onchange = function (e) {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = function () {
             try {
                 const loadedData = JSON.parse(reader.result);
-                
+
                 if (loadedData.creatures) {
                     state.creatures = loadedData.creatures;
                 }
-                
+
                 if (loadedData.battle) {
                     state.battle = loadedData.battle;
                 }
-                
+
                 if (loadedData.groups) {
                     state.groups = loadedData.groups;
                 }
-                
+
                 saveToLocalStorage();
                 renderBattle();
                 renderSavedCreatures();
                 updateContextCreatures();
-                
+
                 addToLog(`Сессия загружена из файла (${file.name})`);
             } catch (err) {
                 alert('Ошибка загрузки файла: ' + err.message);
@@ -2499,7 +2850,7 @@ function loadSession() {
         };
         reader.readAsText(file);
     };
-    
+
     input.click();
 }
 
@@ -2507,7 +2858,7 @@ function loadSession() {
 function enableACEdit(index) {
     const display = document.getElementById(`ac-display-${index}`);
     const edit = document.getElementById(`ac-edit-${index}`);
-    
+
     if (display && edit) {
         display.style.display = 'none';
         edit.style.display = 'inline-block';
@@ -2520,32 +2871,32 @@ function enableACEdit(index) {
 function saveAC(index) {
     const display = document.getElementById(`ac-display-${index}`);
     const edit = document.getElementById(`ac-edit-${index}`);
-    
+
     if (!display || !edit) return;
-    
+
     const newAC = parseInt(edit.value);
     if (isNaN(newAC) || newAC < 0) {
         alert('Введите корректное значение КД');
         edit.focus();
         return;
     }
-    
+
     const creature = state.battle.participants[index];
     if (!creature) return;
-    
+
     const oldAC = creature.ac;
     creature.ac = newAC;
-    
+
     // Обновляем отображение
     display.textContent = newAC;
     display.style.display = 'inline-block';
     edit.style.display = 'none';
-    
+
     // Логируем изменение
     if (oldAC !== newAC) {
         addToLog(`${creature.name}: КД изменено с ${oldAC} на ${newAC}`);
     }
-    
+
     // Обновляем отображение в трекере инициативы
     renderBattle();
     saveToLocalStorage();
@@ -2555,22 +2906,334 @@ function saveAC(index) {
 function changeAC(index, amount) {
     const creature = state.battle.participants[index];
     if (!creature) return;
-    
+
     const oldAC = creature.ac;
     creature.ac = Math.max(0, oldAC + amount);
-    
+
     // Обновляем отображение в деталях
     const display = document.getElementById(`ac-display-${index}`);
     if (display) {
         display.textContent = creature.ac;
     }
-    
+
     // Логируем изменение
     const changeText = amount >= 0 ? `+${amount}` : amount;
     addToLog(`${creature.name}: КД изменено ${changeText} (с ${oldAC} на ${creature.ac})`);
-    
+
     // Обновляем отображение в трекере
     renderBattle();
     saveToLocalStorage();
+}
+
+// Очистить бой и сохранить существа в бестиарий
+function clearBattleWithSave() {
+    if (state.battle.participants.length === 0) {
+        alert('В бою нет существ для сохранения');
+        return;
+    }
+
+    if (!confirm(`Очистить бой и сохранить ${state.battle.participants.length} существ в бестиарий?\n\nСущества, которых нет в бестиарии, будут добавлены туда.`)) {
+        return;
+    }
+
+    let savedCount = 0;
+    let skippedCount = 0;
+
+    // Проходим по всем существам в бою
+    state.battle.participants.forEach(battleCreature => {
+        // Получаем базовое имя (без номера)
+        const baseName = battleCreature.baseName ||
+            battleCreature.name.replace(/\s+\d+$/, '') // удаляем номер в конце
+                .replace(/\s+[IVXLCDM]+$/, '') // удаляем римские цифры
+                .replace(/\s+[A-Z]$/, ''); // удаляем буквы
+
+        // Проверяем, есть ли такое существо уже в бестиарии
+        const existsInBestiary = state.creatures.some(bestiaryCreature => {
+            // Проверяем по ID
+            if (bestiaryCreature.id === battleCreature.id) {
+                return true;
+            }
+
+            // Проверяем по имени (без учета нумерации)
+            const bestiaryBaseName = bestiaryCreature.baseName ||
+                bestiaryCreature.name.replace(/\s+\d+$/, '')
+                    .replace(/\s+[IVXLCDM]+$/, '')
+                    .replace(/\s+[A-Z]$/, '');
+
+            // Сравниваем базовые имена (без учета регистра)
+            return bestiaryBaseName.toLowerCase() === baseName.toLowerCase();
+        });
+
+        // Если существа нет в бестиарии, сохраняем его
+        if (!existsInBestiary) {
+            // Создаем копию существа без боевых данных
+            const creatureToSave = {
+                id: Date.now() + savedCount + skippedCount, // новый уникальный ID
+                name: baseName,
+                baseName: baseName,
+                maxHP: battleCreature.maxHP,
+                ac: battleCreature.originalAC || battleCreature.ac,
+                initBonus: battleCreature.initBonus || 0,
+                attackBonus: battleCreature.originalAttackBonus || battleCreature.attackBonus,
+                damage: battleCreature.originalDamage || battleCreature.damage,
+                damageType: battleCreature.originalDamageType || battleCreature.damageType,
+                resistances: battleCreature.resistances || [],
+                immunities: battleCreature.immunities || [],
+                vulnerabilities: battleCreature.vulnerabilities || [],
+                multiattack: battleCreature.multiattack || '',
+                legendaryActions: battleCreature.legendaryActions || [],
+                lairActions: battleCreature.lairActions || [],
+                color: battleCreature.color || '#3498db'
+            };
+
+            state.creatures.push(creatureToSave);
+            savedCount++;
+        } else {
+            skippedCount++;
+        }
+    });
+
+    // Очищаем бой
+    state.battle.participants = [];
+    state.battle.currentTurn = 0;
+    state.battle.round = 1;
+    state.currentCreature = null;
+
+    // Сохраняем изменения
+    saveToLocalStorage();
+
+    // Обновляем отображение
+    renderBattle();
+    renderSavedCreatures();
+
+    // Добавляем запись в лог
+    addToLog(`=== БОЙ ОЧИЩЕН ===`);
+    addToLog(`Добавлено в бестиарий: ${savedCount} новых существ`);
+    addToLog(`Пропущено (уже есть в бестиарии): ${skippedCount} существ`);
+
+    if (savedCount > 0) {
+        alert(`Бой очищен. В бестиарий добавлено ${savedCount} новых существ. ${skippedCount} существ уже были в бестиарии.`);
+    } else {
+        alert('Бой очищен. Все существа уже были в бестиарии.');
+    }
+}
+
+function saveCreatureToBestiary(creatureIndex) {
+    const creature = state.battle.participants[creatureIndex];
+    if (!creature) return;
+
+    const baseName = extractBaseName(creature.name);
+
+    // Проверяем, есть ли такое существо уже в бестиарии
+    const existsInBestiary = state.creatures.some(bestiaryCreature => {
+        if (bestiaryCreature.id === creature.id) {
+            return true;
+        }
+
+        const bestiaryBaseName = extractBaseName(bestiaryCreature.name);
+        return bestiaryBaseName.toLowerCase() === baseName.toLowerCase();
+    });
+
+    if (existsInBestiary) {
+        alert(`Существо "${baseName}" уже есть в бестиарии!`);
+        return;
+    }
+
+    // Создаем копию существа для бестиария
+    const creatureToSave = {
+        id: Date.now(),
+        name: baseName,
+        baseName: baseName,
+        maxHP: creature.maxHP,
+        ac: creature.originalAC || creature.ac,
+        initBonus: creature.initBonus || 0,
+        attackBonus: creature.originalAttackBonus || creature.attackBonus,
+        damage: creature.originalDamage || creature.damage,
+        damageType: creature.originalDamageType || creature.damageType,
+        resistances: creature.resistances || [],
+        immunities: creature.immunities || [],
+        vulnerabilities: creature.vulnerabilities || [],
+        multiattack: creature.multiattack || '',
+        legendaryActions: creature.legendaryActions || [],
+        lairActions: creature.lairActions || [],
+        color: creature.color || '#3498db'
+    };
+
+    state.creatures.push(creatureToSave);
+    saveToLocalStorage();
+    renderSavedCreatures();
+
+    addToLog(`Существо "${baseName}" сохранено в бестиарий`);
+    alert(`Существо "${baseName}" сохранено в бестиарий!`);
+}
+
+// Просмотр полных статов существа
+function viewCreatureDetails(creatureId) {
+    const creature = state.creatures.find(c => c.id === creatureId);
+    if (!creature) return;
+
+    const container = document.getElementById('view-creature-content');
+
+    // Определяем цвет типа урона
+    const damageTypeColor = getDamageTypeColor(creature.damageType);
+
+    container.innerHTML = `
+        <div class="stat-block" style="border-color: ${creature.color || '#3498db'};">
+            <div class="creature-header" style="border-bottom-color: ${creature.color || '#3498db'};">
+                <h4 style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <span class="creature-color" style="background: ${creature.color || '#3498db'}; width: 25px; height: 25px; border-radius: 50%;"></span>
+                    <span>${creature.name}</span>
+                    ${creature.legendaryActions && creature.legendaryActions.length > 0 ?
+            '<i class="fas fa-crown" title="Имеет легендарные действия" style="color: #f39c12;"></i>' : ''}
+                    ${creature.lairActions && creature.lairActions.length > 0 ?
+            '<i class="fas fa-mountain" title="Имеет действия логова" style="color: #7f8c8d;"></i>' : ''}
+                </h4>
+                <div style="font-size: 0.9em; color: #666;">
+                    <span>ID: ${creature.id}</span>
+                </div>
+            </div>
+            
+            <div class="view-creature-stats">
+                <div class="view-stat-item">
+                    <label>Максимальное HP</label>
+                    <span>${creature.maxHP}</span>
+                </div>
+                <div class="view-stat-item">
+                    <label>Класс Доспеха</label>
+                    <span>${creature.ac}</span>
+                </div>
+                <div class="view-stat-item">
+                    <label>Бонус к инициативе</label>
+                    <span>${creature.initBonus || 0}</span>
+                </div>
+                <div class="view-stat-item">
+                    <label>Бонус к атаке</label>
+                    <span>+${creature.attackBonus}</span>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h5><i class="fas fa-bolt"></i> Урон</h5>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <strong>Формула урона:</strong>
+                        <div style="font-size: 1.2rem; font-weight: bold; margin-top: 5px;">${creature.damage}</div>
+                    </div>
+                    <div>
+                        <strong>Тип урона:</strong>
+                        <div style="margin-top: 5px;">
+                            <span class="damage-type" style="background: ${damageTypeColor}; padding: 5px 15px; border-radius: 20px; color: white; font-weight: bold;">
+                                ${creature.damageType}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            ${creature.multiattack ? `
+                <div class="section">
+                    <h5><i class="fas fa-fist-raised"></i> Мультиатака</h5>
+                    <div class="view-action-item">${creature.multiattack}</div>
+                </div>
+            ` : ''}
+            
+            <div class="section">
+                <h5><i class="fas fa-shield-alt"></i> Защита от типов урона</h5>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                    ${creature.resistances && creature.resistances.length > 0 ? `
+                        <div>
+                            <strong style="color: var(--info);">Сопротивления:</strong>
+                            <div class="view-damage-types">
+                                ${creature.resistances.map(r =>
+                `<span class="view-damage-mod resistance">${r}</span>`
+            ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${creature.immunities && creature.immunities.length > 0 ? `
+                        <div>
+                            <strong style="color: var(--gray);">Иммунитеты:</strong>
+                            <div class="view-damage-types">
+                                ${creature.immunities.map(i =>
+                `<span class="view-damage-mod immunity">${i}</span>`
+            ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${creature.vulnerabilities && creature.vulnerabilities.length > 0 ? `
+                        <div>
+                            <strong style="color: var(--danger);">Уязвимости:</strong>
+                            <div class="view-damage-types">
+                                ${creature.vulnerabilities.map(v =>
+                `<span class="view-damage-mod vulnerability">${v}</span>`
+            ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            
+            ${creature.legendaryActions && creature.legendaryActions.length > 0 ? `
+                <div class="section">
+                    <h5><i class="fas fa-crown"></i> Легендарные действия</h5>
+                    <div class="view-actions-list">
+                        ${creature.legendaryActions.map((action, index) => `
+                            <div class="view-action-item legendary">
+                                <strong>Действие ${index + 1}:</strong> ${action}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${creature.lairActions && creature.lairActions.length > 0 ? `
+                <div class="section">
+                    <h5><i class="fas fa-mountain"></i> Действия логова</h5>
+                    <div class="view-actions-list">
+                        ${creature.lairActions.map((action, index) => `
+                            <div class="view-action-item lair">
+                                <strong>Действие ${index + 1}:</strong> ${action}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <div class="section">
+                <h5><i class="fas fa-info-circle"></i> Дополнительная информация</h5>
+                <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                    <div>
+                        <strong>Цвет метки:</strong>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                            <div class="creature-color" style="background: ${creature.color || '#3498db'}; width: 25px; height: 25px; border-radius: 50%;"></div>
+                            <code>${creature.color || '#3498db'}</code>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Дата создания:</strong>
+                        <div style="margin-top: 5px;">
+                            ${new Date(creature.id).toLocaleString('ru-RU')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons" style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button onclick="editCreature(${creature.id})" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Редактировать
+                </button>
+                <button onclick="addSingleToBattle(${creature.id})" class="btn btn-primary">
+                    <i class="fas fa-user"></i> Добавить в бой
+                </button>
+                <button onclick="showAddGroupToBattleModal(${creature.id})" class="btn btn-info">
+                    <i class="fas fa-users"></i> Добавить группу
+                </button>
+            </div>
+        </div>
+    `;
+
+    showModal('view-creature-modal');
 }
 
