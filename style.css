@@ -1577,6 +1577,47 @@ label {
     background: #f8f9fa;
 }
 
+.temp-ac-modifier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 3px solid #3498db;
+}
+
+.temp-ac-modifier:hover {
+    background: #e9ecef;
+}
+
+.temp-ac-badge {
+    display: inline-block;
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin: 2px;
+    border: 1px solid #3498db;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.temp-ac-badge:hover {
+    background: rgba(52, 152, 219, 0.2);
+}
+
+.temp-ac-indicator {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
 
 
 @media (max-width: 768px) {

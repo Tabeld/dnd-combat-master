@@ -951,7 +951,74 @@
                 </div>
             </div>
         </div>
-        
+        <!-- Модальное окно для временных КД -->
+        <div id="temp-ac-modal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3><i class="fas fa-shield-alt"></i> Временное изменение КД</h3>
+                    <button class="close-btn" onclick="closeModal('temp-ac-modal')">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div id="current-ac-display" style="
+                        background: #f8f9fa;
+                        padding: 10px;
+                        border-radius: 5px;
+                        margin-bottom: 15px;
+                        font-weight: bold;
+                        text-align: center;
+                    "></div>
+                    
+                    <div class="form-group">
+                        <label>Изменение КД:</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="temp-ac-value" 
+                                style="flex: 1;" 
+                                placeholder="Например: +2 или -3" 
+                                step="1">
+                            <select id="temp-ac-type" style="width: 150px;">
+                                <option value="turns">На ходы</option>
+                                <option value="until_removed">До снятия</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="temp-ac-duration-group">
+                        <label>Длительность (ходов):</label>
+                        <input type="number" id="temp-ac-duration" value="1" min="1" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Описание (опционально):</label>
+                        <input type="text" id="temp-ac-description" 
+                            placeholder="Например: Защитная аура, Магический щит и т.д.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Активные временные КД:</label>
+                        <div id="active-temp-ac" style="
+                            max-height: 200px;
+                            overflow-y: auto;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                            padding: 10px;
+                            margin-top: 10px;
+                        ">
+                            <!-- Список активных модификаторов будет здесь -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer" style="display: flex; gap: 10px;">
+                    <button onclick="applyTempAC()" class="btn btn-success" style="flex: 1;">
+                        <i class="fas fa-plus"></i> Применить изменение
+                    </button>
+                    <button onclick="closeModal('temp-ac-modal')" class="btn btn-secondary" style="flex: 1;">
+                        Отмена
+                    </button>
+                </div>
+            </div>
+        </div>
         <script src="script.js" defer></script>
     </body>
 </html>
