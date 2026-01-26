@@ -103,7 +103,7 @@ header p {
     align-items: center;
     justify-content: center;
     gap: 9px;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .tab:last-child {
@@ -149,7 +149,7 @@ header p {
     display: flex;
     flex-direction: column;
     max-height: calc(70vh - 100px); /* Ограничение высоты */
-    min-height: 500px;
+    min-height: 700px;
     overflow: hidden;
 }
 
@@ -160,7 +160,8 @@ header p {
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
-    height: 300px;
+    height: 350px;
+    margin-top: -30px;
 }
 
 .creature-section {
@@ -168,7 +169,7 @@ header p {
     grid-row: 1;
     display: flex;
     max-height: calc(70vh - 100px); /* Ограничение высоты */
-    min-height: 500px;
+    min-height: 700px;
     flex-direction: column;
     overflow: hidden;
 }
@@ -1987,4 +1988,3 @@ label {
         grid-template-columns: 1fr 1fr;
     }
 }
-
