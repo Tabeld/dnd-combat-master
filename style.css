@@ -369,7 +369,6 @@ header p {
 }
 
 .initiative-item.dragging {
-    opacity: 0.5;
     cursor: grabbing;
     transform: rotate(3deg);
     z-index: 1000;
@@ -430,7 +429,6 @@ header p {
     font-size: 10px;
     color: white;
     opacity: 0;
-    transition: opacity 0.3s;
 }
 
 .initiative-score:hover .edit-btn {
@@ -1163,6 +1161,7 @@ label {
     padding: 2px 8px;
     border-radius: 4px;
     border: 1px solid transparent;
+    position: relative;
 }
 
 .ac-display:hover {
@@ -1610,14 +1609,8 @@ label {
 
 .temp-ac-indicator {
     animation: pulse 2s infinite;
+    cursor: help;
 }
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
 
 
 @media (max-width: 768px) {

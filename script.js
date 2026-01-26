@@ -930,6 +930,11 @@ function createInitiativeItem(creature, isActive) {
     const tempHPPercentage = creature.tempHP > 0 ?
         Math.min(100, (creature.tempHP / creature.maxHP) * 100) : 0;
 
+    // Рассчитываем текущее КД с учетом модификаторов
+    const currentAC = calculateCurrentAC(creature);
+    const baseAC = creature.ac;
+    const hasTempACModifiers = creature.tempACModifiers && creature.tempACModifiers.length > 0;
+
     div.innerHTML = `
         <div class="initiative-score">
             ${creature.initiative}
@@ -950,10 +955,17 @@ function createInitiativeItem(creature, isActive) {
             </div>
             <div class="creature-stats">
                 <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
-                <span>🛡️ ${calculateCurrentAC(creature)}</span>
+                <span class="ac-display" title="${hasTempACModifiers ? `Базовое КД: ${baseAC}` : ''}">
+                    🛡️ ${currentAC}
+                    ${hasTempACModifiers ? 
+                        `<span style="font-size: 0.8em; color: #f39c12; margin-left: 2px;">
+                            (${baseAC})
+                        </span>` : ''
+                    }
+                </span>
                 ${creature.tempACModifiers && creature.tempACModifiers.length > 0 ?
                     `<span class="temp-ac-indicator" title="${creature.tempACModifiers.map(m => 
-                        `${m.description || ''} ${m.value >= 0 ? '+' : ''}${m.value}`).join(', ')}"
+                        `${m.description || ''} ${m.value >= 0 ? '+' : ''}${m.value}${m.type === 'turns' ? ` (${m.duration} ходов)` : ''}`).join(', ')}"
                         style="background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.8em;">
                         ⬆️${creature.tempACModifiers.reduce((sum, m) => sum + m.value, 0) >= 0 ? '+' : ''}
                         ${creature.tempACModifiers.reduce((sum, m) => sum + m.value, 0)}
@@ -1013,6 +1025,18 @@ function createGroupElement(group, isActive) {
     groupElement.addEventListener('dragend', handleDragEnd);
 
     const aliveCount = group.members.filter(m => m.currentHP > 0).length;
+    
+    // Рассчитываем статистику по группе
+    const groupACs = group.members.map(m => calculateCurrentAC(m));
+    const minAC = Math.min(...groupACs);
+    const maxAC = Math.max(...groupACs);
+    const hasTempACModifiers = group.members.some(m => m.tempACModifiers && m.tempACModifiers.length > 0);
+    const totalTempACBonus = group.members.reduce((sum, m) => {
+        if (m.tempACModifiers && m.tempACModifiers.length > 0) {
+            return sum + m.tempACModifiers.reduce((s, mod) => s + mod.value, 0);
+        }
+        return sum;
+    }, 0);
 
     groupElement.innerHTML = `
         <div class="initiative-score">
@@ -1029,7 +1053,20 @@ function createGroupElement(group, isActive) {
             </div>
             <div class="creature-stats">
                 <span>❤️ ${group.members.filter(m => m.currentHP > 0).length}/${group.members.length}</span>
-                <span>🛡️ ${group.members[0]?.ac || 10}</span>
+                <span class="ac-display" title="${hasTempACModifiers ? `КД в группе: от ${minAC} до ${maxAC}` : `КД: ${group.members[0]?.ac || 10}`}">
+                    🛡️ ${minAC === maxAC ? minAC : `${minAC}-${maxAC}`}
+                    ${hasTempACModifiers ? 
+                        `<span style="font-size: 0.8em; color: #f39c12; margin-left: 2px;">
+                            (${totalTempACBonus >= 0 ? '+' : ''}${totalTempACBonus})
+                        </span>` : ''
+                    }
+                </span>
+                ${hasTempACModifiers ?
+                    `<span class="temp-ac-indicator" title="В группе есть временные модификаторы КД"
+                        style="background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.8em;">
+                        ⬆️
+                    </span>` : ''
+                }
             </div>
         </div>
         <div>
@@ -1075,6 +1112,10 @@ function createGroupElement(group, isActive) {
                 const hpPercentage = Math.max(0, (member.currentHP / member.maxHP) * 100);
                 const tempHPPercentage = member.tempHP > 0 ?
                     Math.min(100, (member.tempHP / member.maxHP) * 100) : 0;
+                    
+                // Рассчитываем текущее КД с учетом модификаторов
+                const currentAC = calculateCurrentAC(member);
+                const hasTempModifiers = member.tempACModifiers && member.tempACModifiers.length > 0;
 
                 memberElement.innerHTML = `
                     <div style="flex: 1;">
@@ -1088,12 +1129,28 @@ function createGroupElement(group, isActive) {
                         <div class="hp-bar-container" style="height: 6px; margin: 3px 0;">
                             <div class="hp-bar" style="width: ${hpPercentage}%"></div>
                         </div>
-                        <div class="hp-display">
+                        <div class="hp-display" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <span>❤️ ${member.currentHP}/${member.maxHP}</span>
+                            <span class="ac-display" title="${hasTempModifiers ? `Базовое КД: ${member.ac}` : ''}">
+                                🛡️ ${currentAC}
+                                ${hasTempModifiers ? 
+                                    `<span style="font-size: 0.8em; color: #f39c12; margin-left: 2px;">
+                                        (${member.ac})
+                                    </span>` : ''
+                                }
+                            </span>
                             ${member.tempHP > 0 ?
                         `<span class="temp-hp-display" style="background: rgba(243, 156, 18, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold;">
-                                    🛡️ ${member.tempHP}
+                                    🛡️✨ ${member.tempHP}
                                 </span>` : ''
+                    }
+                            ${hasTempModifiers ?
+                        `<span class="temp-ac-indicator" title="${member.tempACModifiers.map(m => 
+                            `${m.description || ''} ${m.value >= 0 ? '+' : ''}${m.value}${m.type === 'turns' ? ` (${m.duration} ходов)` : ''}`).join(', ')}"
+                            style="background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.8em;">
+                            ⬆️${member.tempACModifiers.reduce((sum, m) => sum + m.value, 0) >= 0 ? '+' : ''}
+                            ${member.tempACModifiers.reduce((sum, m) => sum + m.value, 0)}
+                        </span>` : ''
                     }
                             ${member.conditions.some(c => c.name === 'concentration') ?
                         `<span style="background: rgba(155, 89, 182, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold; color: #9b59b6;">
@@ -1136,16 +1193,47 @@ function updateGroupMemberDisplay(memberIndex) {
 
     // Обновляем отображение
     const hpPercentage = Math.max(0, (creature.currentHP / creature.maxHP) * 100);
+    
+    // Рассчитываем текущее КД с учетом модификаторов
+    const currentAC = calculateCurrentAC(creature);
+    const hasTempModifiers = creature.tempACModifiers && creature.tempACModifiers.length > 0;
 
+    // Обновляем полоску HP
     memberElement.querySelector('.hp-bar').style.width = `${hpPercentage}%`;
-    memberElement.querySelector('.hp-display').innerHTML = `
-        <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
-        ${creature.conditions.some(c => c.name === 'concentration') ?
-            `<span style="background: rgba(155, 89, 182, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold; color: #9b59b6;">
-                ✨ Концентрация
-            </span>` : ''
-        }
-    `;
+    
+    // Обновляем отображение HP и КД
+    const hpDisplay = memberElement.querySelector('.hp-display');
+    if (hpDisplay) {
+        hpDisplay.innerHTML = `
+            <span>❤️ ${creature.currentHP}/${creature.maxHP}</span>
+            <span class="ac-display" title="${hasTempModifiers ? `Базовое КД: ${creature.ac}` : ''}">
+                🛡️ ${currentAC}
+                ${hasTempModifiers ? 
+                    `<span style="font-size: 0.8em; color: #f39c12; margin-left: 2px;">
+                        (${creature.ac})
+                    </span>` : ''
+                }
+            </span>
+            ${creature.tempHP > 0 ?
+                `<span class="temp-hp-display" style="background: rgba(243, 156, 18, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold;">
+                    🛡️✨ ${creature.tempHP}
+                </span>` : ''
+            }
+            ${hasTempModifiers ?
+                `<span class="temp-ac-indicator" title="${creature.tempACModifiers.map(m => 
+                    `${m.description || ''} ${m.value >= 0 ? '+' : ''}${m.value}${m.type === 'turns' ? ` (${m.duration} ходов)` : ''}`).join(', ')}"
+                    style="background: #f39c12; color: white; padding: 1px 6px; border-radius: 10px; font-size: 0.8em;">
+                    ⬆️${creature.tempACModifiers.reduce((sum, m) => sum + m.value, 0) >= 0 ? '+' : ''}
+                    ${creature.tempACModifiers.reduce((sum, m) => sum + m.value, 0)}
+                </span>` : ''
+            }
+            ${creature.conditions.some(c => c.name === 'concentration') ?
+                `<span style="background: rgba(155, 89, 182, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold; color: #9b59b6;">
+                    ✨ Концентрация
+                </span>` : ''
+            }
+        `;
+    }
 }
 
 // ============ DRAG & DROP ============
