@@ -704,16 +704,18 @@ function calculateCurrentAC(creature) {
     }
 
     // Получаем все активные модификаторы
-    const activeModifiers = creature.tempACModifiers.filter(mod =>
-        mod.type === 'until_removed' || mod.duration > 0
-    );
+    const activeModifiers = creature.tempACModifiers.filter(mod => {
+        if (mod.type === 'turns') {
+            return mod.duration > 0;
+        }
+        return mod.type === 'until_removed';
+    });
 
     if (activeModifiers.length === 0) {
         return creature.ac;
     }
 
-    // Применяем модификаторы: можно настроить логику (складывать, брать максимум и т.д.)
-    // Здесь просто применяем все бонусы как аддитивные
+    // Применяем модификаторы
     let totalBonus = 0;
     activeModifiers.forEach(mod => {
         totalBonus += mod.value;
@@ -729,17 +731,21 @@ function decrementTempACDurations() {
             creature.tempACModifiers.forEach(mod => {
                 if (mod.type === 'turns' && mod.duration > 0) {
                     mod.duration--;
-                    mod.expired = mod.duration <= 0;
+                    // Не помечаем как expired здесь - удалим сразу если duration <= 0
                 }
             });
 
             // Удаляем истекшие модификаторы
-            creature.tempACModifiers = creature.tempACModifiers.filter(mod =>
-                !mod.expired && (mod.type === 'until_removed' || mod.duration > 0)
-            );
+            creature.tempACModifiers = creature.tempACModifiers.filter(mod => {
+                if (mod.type === 'turns') {
+                    return mod.duration > 0;
+                }
+                return mod.type === 'until_removed';
+            });
         }
     });
 }
+
 // Бросок инициативы с бонусом
 function rollInitiative(bonus = 0) {
     return Math.floor(Math.random() * 20) + 1 + bonus;
@@ -972,7 +978,7 @@ function createInitiativeItem(creature, isActive) {
                     </span>` : ''
                 }
                 ${creature.tempHP > 0 ?
-            `<span class="temp-hp-display">🛡️✨ ${creature.tempHP}</span>` : ''}
+            `<span class="temp-hp-display">❤️✨ ${creature.tempHP}</span>` : ''}
             </div>
             <div class="conditions">
                 ${creature.conditions.map(c => {
@@ -1141,7 +1147,7 @@ function createGroupElement(group, isActive) {
                             </span>
                             ${member.tempHP > 0 ?
                         `<span class="temp-hp-display" style="background: rgba(243, 156, 18, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold;">
-                                    🛡️✨ ${member.tempHP}
+                            ❤️✨ ${member.tempHP}
                                 </span>` : ''
                     }
                             ${hasTempModifiers ?
@@ -1216,7 +1222,7 @@ function updateGroupMemberDisplay(memberIndex) {
             </span>
             ${creature.tempHP > 0 ?
                 `<span class="temp-hp-display" style="background: rgba(243, 156, 18, 0.2); padding: 2px 6px; border-radius: 10px; font-weight: bold;">
-                    🛡️✨ ${creature.tempHP}
+                    ❤️✨ ${creature.tempHP}
                 </span>` : ''
             }
             ${hasTempModifiers ?
@@ -1653,7 +1659,7 @@ function renderCreatureDetails() {
                                     font-size: 0.8rem;
                                 ">
                                     ${mod.value >= 0 ? '+' : ''}${mod.value} 
-                                    ${mod.type === 'turns' ? `(${mod.duration})` : '⏱️'}
+                                    ${mod.type === 'turns' ? `(${mod.duration} хв)` : '⏱️'}
                                     <button onclick="removeTempACModifier(${state.currentCreature}, ${idx})" 
                                             style="background: none; border: none; color: #666; margin-left: 5px; cursor: pointer; font-size: 0.7rem;">
                                         ✕
@@ -1965,6 +1971,8 @@ function newRound() {
             cond.duration--;
             return cond.duration > 0;
         });
+        creature.usedLegendaryActions = 0;
+        creature.usedLairActions = false;
     });
 
     // Сбрасываем легендарные действия
@@ -2119,24 +2127,34 @@ function showTempACModal() {
     document.getElementById('current-ac-display').textContent =
         `Текущее КД: ${currentAC} (Базовое: ${creature.ac})`;
 
-    // Показываем активные модификаторы
+    // Показываем активные модификаторы (только те, у которых осталась длительность)
     const modifiersList = document.getElementById('active-temp-ac');
-    if (creature.tempACModifiers && creature.tempACModifiers.length > 0) {
-        modifiersList.innerHTML = creature.tempACModifiers.map((mod, index) => `
-            <div class="temp-ac-modifier">
-                <div>
-                    <strong>${mod.value >= 0 ? '+' : ''}${mod.value} к КД</strong>
-                    <div style="font-size: 0.9em; color: #666;">
-                        ${mod.description || 'Без описания'}
-                        ${mod.type === 'turns' ? ` (Осталось ходов: ${mod.duration})` : ' (До снятия)'}
+    const activeModifiers = creature.tempACModifiers ? 
+        creature.tempACModifiers.filter(mod => {
+            if (mod.type === 'turns') return mod.duration > 0;
+            return mod.type === 'until_removed';
+        }) : [];
+        
+    if (activeModifiers.length > 0) {
+        modifiersList.innerHTML = activeModifiers.map((mod, index) => {
+            // Находим индекс в исходном массиве
+            const originalIndex = creature.tempACModifiers.indexOf(mod);
+            return `
+                <div class="temp-ac-modifier">
+                    <div>
+                        <strong>${mod.value >= 0 ? '+' : ''}${mod.value} к КД</strong>
+                        <div style="font-size: 0.9em; color: #666;">
+                            ${mod.description || 'Без описания'}
+                            ${mod.type === 'turns' ? ` (Осталось ходов: ${mod.duration})` : ' (До снятия)'}
+                        </div>
                     </div>
+                    <button onclick="removeTempACModifier(${state.currentCreature}, ${originalIndex})" 
+                            class="btn btn-xs btn-danger">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <button onclick="removeTempACModifier(${state.currentCreature}, ${index})" 
-                        class="btn btn-xs btn-danger">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } else {
         modifiersList.innerHTML = '<div style="text-align: center; color: #666; padding: 10px;">Нет активных временных КД</div>';
     }
@@ -2232,6 +2250,11 @@ function removeTempACModifier(creatureIndex, modifierIndex) {
             showTempACModal();
         }
     }
+    
+    if (creature.groupId) {
+        updateGroupMemberDisplay(creatureIndex);
+    }
+    
     renderBattle();
     saveToLocalStorage();
 }
@@ -2908,6 +2931,28 @@ function nextTurn() {
             cond.duration--;
             return cond.duration > 0;
         });
+        
+        // Уменьшаем длительность временных КД для текущего существа
+        if (current.tempACModifiers && current.tempACModifiers.length > 0) {
+            current.tempACModifiers.forEach(mod => {
+                if (mod.type === 'turns' && mod.duration > 0) {
+                    mod.duration--;
+                }
+            });
+            
+            // Удаляем истекшие модификаторы
+            current.tempACModifiers = current.tempACModifiers.filter(mod => {
+                if (mod.type === 'turns') {
+                    return mod.duration > 0;
+                }
+                return mod.type === 'until_removed';
+            });
+            
+            // Обновляем отображение для существ в группах
+            if (current.groupId) {
+                updateGroupMemberDisplay(state.battle.currentTurn);
+            }
+        }
     }
 
     // Переходим к следующему существу
@@ -2925,8 +2970,6 @@ function nextTurn() {
     addToLog(`Ход: ${newCurrent ? newCurrent.name : '???'}`);
 }
 
-
-
 function previousTurn() {
     if (state.battle.participants.length === 0) return;
 
@@ -2936,6 +2979,15 @@ function previousTurn() {
         current.conditions.forEach(cond => {
             cond.duration++;
         });
+        
+        // Увеличиваем длительность временных КД для отката
+        if (current.tempACModifiers) {
+            current.tempACModifiers.forEach(mod => {
+                if (mod.type === 'turns') {
+                    mod.duration++;
+                }
+            });
+        }
     }
 
     state.battle.currentTurn = (state.battle.currentTurn - 1 + state.battle.participants.length) % state.battle.participants.length;
@@ -2956,7 +3008,6 @@ function previousTurn() {
 }
 
 function newRound() {
-
     state.battle.round++;
     state.battle.currentTurn = 0;
 
@@ -2968,6 +3019,7 @@ function newRound() {
         });
         creature.usedLegendaryActions = 0;
         creature.usedLairActions = false;
+        
     });
 
     updateRoundDisplay();

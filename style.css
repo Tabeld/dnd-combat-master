@@ -181,12 +181,12 @@ header p {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 90%;
 }
 
 .card-header {
     background: linear-gradient(135deg, var(--light) 0%, #f8f9fa 100%);
-    padding: 15px;
+    padding: 12px;
     border-bottom: 2px solid var(--secondary);
     display: flex;
     justify-content: space-between;
