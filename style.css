@@ -1577,14 +1577,14 @@ label {
     background: #f8f9fa;
 }
 
-/* Адаптация для мобильных */
+
+
 @media (max-width: 768px) {
     .view-creature-stats {
         grid-template-columns: 1fr;
     }
 }
 
-/* Для адаптивных версий */
 @media (max-width: 1200px) {
     .initiative-section .card-header .btn-sm {
         padding: 4px 8px;

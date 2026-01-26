@@ -975,9 +975,14 @@ function createGroupElement(group, isActive) {
             </div>
         </div>
         <div>
-            <button onclick="editGroupInitiative('${group.id}')" class="btn btn-sm btn-warning">
-                <i class="fas fa-edit"></i>
-            </button>
+            <div style="display: flex; gap: 5px;">
+                <button onclick="editGroupInitiative('${group.id}')" class="btn btn-sm btn-warning">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="removeGroup('${group.id}')" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
         </div>
     `;
 
@@ -1311,6 +1316,58 @@ function removeFromBattle(index) {
     }
 }
 
+// Удаление группы целиком
+function removeGroup(groupId) {
+    if (!confirm('Удалить всю группу целиком?')) {
+        return;
+    }
+
+    const groupMembers = state.battle.participants.filter(p => p.groupId === groupId);
+    if (groupMembers.length === 0) return;
+
+    // Получаем имя группы из первого участника
+    const groupName = groupMembers[0].baseName || groupMembers[0].name.replace(/\s+\d+$/, '');
+    
+    // Сохраняем индексы участников группы
+    const indicesToRemove = [];
+    groupMembers.forEach(member => {
+        const index = state.battle.participants.findIndex(p => p.id === member.id);
+        if (index !== -1) {
+            indicesToRemove.push(index);
+        }
+    });
+
+    // Сортируем индексы по убыванию для правильного удаления
+    indicesToRemove.sort((a, b) => b - a);
+    
+    // Удаляем всех участников группы
+    let removedCount = 0;
+    indicesToRemove.forEach(index => {
+        if (state.currentCreature === index) {
+            state.currentCreature = null;
+        } else if (state.currentCreature > index) {
+            state.currentCreature--;
+        }
+        
+        state.battle.participants.splice(index, 1);
+        removedCount++;
+    });
+
+    // Удаляем запись о группе
+    delete state.battle.groups[groupId];
+
+    // Корректируем текущий ход
+    if (state.battle.currentTurn >= state.battle.participants.length) {
+        state.battle.currentTurn = Math.max(0, state.battle.participants.length - 1);
+    }
+
+    addToLog(`Группа "${groupName}" (${removedCount} существ) удалена из боя`);
+
+    renderBattle();
+    updateContextCreatures();
+    saveToLocalStorage();
+}
+
 // Редактирование инициативы
 function editCreatureInitiative(index) {
     const creature = state.battle.participants[index];
@@ -1480,21 +1537,30 @@ function renderCreatureDetails() {
                 </div>
             </div>
             
-            <div class="action-buttons">
-                <button onclick="rollAttack()" class="btn btn-warning">
+            <div class="action-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 15px;">
+                <button onclick="rollAttack()" class="btn btn-warning" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-crosshairs"></i> Атака
                 </button>
-                <button onclick="rollDamage()" class="btn btn-danger">
+                <button onclick="rollDamage()" class="btn btn-danger" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-bolt"></i> Урон
                 </button>
-                <button onclick="showConditionModal()" class="btn btn-primary">
+                <button onclick="showConditionModal()" class="btn btn-primary" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-exclamation-triangle"></i> Состояния
                 </button>
-                <button onclick="toggleConcentration()" class="btn btn-info">
-                    <i class="fas fa-brain"></i> ${creature.conditions.some(c => c.name === 'concentration') ? 'Сбросить концентрацию' : 'Концентрация'}
+                <button onclick="toggleConcentration()" class="btn btn-info" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-brain"></i> ${creature.conditions.some(c => c.name === 'concentration') ? 'Сброс' : 'Концентрация'}
                 </button>
-                <button onclick="showEditCreatureModal(${state.currentCreature})" class="btn btn-primary">
-                    <i class="fas fa-edit"></i> Редактировать
+                <button onclick="showEditCreatureModal(state.currentCreature)" class="btn btn-primary" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-edit"></i> Ред.
+                </button>
+                <button onclick="saveCreatureFromBattle(state.currentCreature)" class="btn btn-success" 
+                        style="padding: 2px 5px; height: 40px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-book-medical"></i> Сохранить
                 </button>
             </div>
     `;
@@ -3065,6 +3131,70 @@ function saveCreatureToBestiary(creatureIndex) {
 
     addToLog(`Существо "${baseName}" сохранено в бестиарий`);
     alert(`Существо "${baseName}" сохранено в бестиарий!`);
+}
+
+// Сохранение существа из боя в бестиарий
+function saveCreatureFromBattle(index) {
+    const creature = state.battle.participants[index];
+    if (!creature) {
+        alert('Существо не найдено');
+        return;
+    }
+
+    // Получаем базовое имя (без номера группы)
+    const baseName = extractBaseName(creature.name);
+
+    // Проверяем, есть ли уже такое существо в бестиарии
+    const existsInBestiary = state.creatures.some(bestiaryCreature => {
+        if (bestiaryCreature.id === creature.id) {
+            return true;
+        }
+        
+        const bestiaryBaseName = extractBaseName(bestiaryCreature.name);
+        return bestiaryBaseName.toLowerCase() === baseName.toLowerCase();
+    });
+
+    if (existsInBestiary) {
+        alert(`Существо "${baseName}" уже есть в бестиарии!`);
+        return;
+    }
+
+    // Создаем копию существа для бестиария
+    const creatureToSave = {
+        id: Date.now(), // Новый уникальный ID
+        name: baseName,
+        baseName: baseName,
+        maxHP: creature.maxHP,
+        ac: creature.originalAC || creature.ac,
+        initBonus: creature.initBonus || 0,
+        attackBonus: creature.originalAttackBonus || creature.attackBonus,
+        damage: creature.originalDamage || creature.damage,
+        damageType: creature.originalDamageType || creature.damageType,
+        resistances: creature.resistances || [],
+        immunities: creature.immunities || [],
+        vulnerabilities: creature.vulnerabilities || [],
+        multiattack: creature.multiattack || '',
+        legendaryActions: creature.legendaryActions || [],
+        lairActions: creature.lairActions || [],
+        color: creature.color || '#3498db'
+    };
+
+    state.creatures.push(creatureToSave);
+    saveToLocalStorage();
+    renderSavedCreatures();
+
+    addToLog(`Существо "${baseName}" сохранено в бестиарий`);
+    alert(`Существо "${baseName}" успешно сохранено в бестиарий!`);
+}
+
+// Вспомогательная функция для извлечения базового имени
+function extractBaseName(name) {
+    if (!name) return '';
+    
+    // Удаляем суффиксы номеров, римские цифры, буквы
+    return name.replace(/\s+\d+$/, '') // цифры в конце
+        .replace(/\s+[IVXLCDM]+$/, '') // римские цифры
+        .replace(/\s+[A-Z]$/, ''); // буквы в конце
 }
 
 // Просмотр полных статов существа
