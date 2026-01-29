@@ -1433,6 +1433,18 @@ label {
     border-radius: var(--radius-sm);
 }
 
+.btn-warning.legendary-reset {
+    background-color: #f39c12;
+    border-color: #e67e22;
+    color: white;
+}
+
+.btn-warning.legendary-reset:disabled {
+    background-color: #95a5a6;
+    border-color: #7f8c8d;
+    cursor: not-allowed;
+}
+
 /* Улучшенное отображение состояний */
 .conditions-grid {
     display: grid;
@@ -1624,6 +1636,82 @@ label {
     background: #e9ecef;
 }
 
+.death-save-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .death-save-circle.success {
+        border: 2px solid #2ecc71;
+        color: #2ecc71;
+    }
+    
+    .death-save-circle.success.filled {
+        background-color: #2ecc71;
+        color: white;
+    }
+    
+    .death-save-circle.failure {
+        border: 2px solid #e74c3c;
+        color: #e74c3c;
+    }
+    
+    .death-save-circle.failure.filled {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .death-saves-result {
+        text-align: center;
+        padding: 8px;
+        border-radius: var(--radius-sm);
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .death-saves-result.dead {
+        background-color: #fadbd8;
+        color: #c0392b;
+        border: 1px solid #e74c3c;
+    }
+    
+    .death-saves-result.stabilized {
+        background-color: #d5f4e6;
+        color: #27ae60;
+        border: 1px solid #2ecc71;
+    }
+    
+    .death-saves-mini {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+        font-size: 0.8rem;
+    }
+    
+    .death-save-mini {
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+    
+    .death-save-mini.success {
+        background-color: rgba(46, 204, 113, 0.2);
+        color: #27ae60;
+    }
+    
+    .death-save-mini.failure {
+        background-color: rgba(231, 76, 60, 0.2);
+        color: #c0392b;
+    }
+
 .temp-ac-badge {
     display: inline-block;
     background: rgba(52, 152, 219, 0.1);
@@ -1644,6 +1732,7 @@ label {
     animation: pulse 2s infinite;
     cursor: help;
 }
+
 
 
 @media (max-width: 768px) {

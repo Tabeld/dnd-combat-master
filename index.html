@@ -607,36 +607,119 @@
 
         <div id="condition-modal" class="modal">
             <div class="modal-content">
-                <h3><i class="fas fa-exclamation-triangle"></i> Добавить
-                    состояние</h3>
-                <select id="condition-select" class="form-control">
-                    <option value="blinded">Ослеплён</option>
-                    <option value="charmed">Очарован</option>
-                    <option value="frightened">Испуган</option>
-                    <option value="grappled">Схвачен</option>
-                    <option value="paralyzed">Парализован</option>
-                    <option value="petrified">Окаменевший</option>
-                    <option value="poisoned">Отравлен</option>
-                    <option value="prone">Лежит</option>
-                    <option value="restrained">Скован</option>
-                    <option value="stunned">Оглушён</option>
-                    <option value="unconscious">Бессознателен</option>
-                    <option value="invisible">Невидим</option>
-                    <option value="concentration">Концентрация</option>
-                </select>
-                <div class="form-group">
-                    <label>Длительность (ходов):</label>
-                    <input type="number" id="condition-duration" value="1"
-                        min="1" class="form-control">
+                <div class="modal-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Добавить состояние</h3>
+                    <button class="close-btn" onclick="closeModal('condition-modal')">&times;</button>
                 </div>
-                <div class="modal-buttons">
-                    <button onclick="addCondition()" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Добавить
-                    </button>
-                    <button onclick="closeModal('condition-modal')"
-                        class="btn btn-warning">
-                        <i class="fas fa-times"></i> Отмена
-                    </button>
+                
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Выберите состояние:</label>
+                        <select id="condition-select" class="form-control">
+                            <option value="">Выберите состояние...</option>
+                            <option value="blinded">Ослеплён</option>
+                            <option value="charmed">Очарован</option>
+                            <option value="frightened">Испуган</option>
+                            <option value="grappled">Схвачен</option>
+                            <option value="paralyzed">Парализован</option>
+                            <option value="petrified">Окаменевший</option>
+                            <option value="poisoned">Отравлен</option>
+                            <option value="prone">Лежит (сбит с ног)</option>
+                            <option value="restrained">Скован</option>
+                            <option value="stunned">Оглушён</option>
+                            <option value="unconscious">Бессознателен</option>
+                            <option value="invisible">Невидим</option>
+                            <option value="deafened">Оглохший</option>
+                            <option value="exhaustion">Истощённый</option>
+                            <option value="incapacitated">Недееспособный</option>
+                        </select>
+                    </div>
+                    
+                    <div id="condition-description" style="
+                        margin: 10px 0;
+                        padding: 10px;
+                        background: #f8f9fa;
+                        border-radius: 5px;
+                        font-size: 0.9em;
+                        display: none;
+                    "></div>
+                    
+                    <div id="exhaustion-level-group" style="display: none;">
+                        <div class="form-group">
+                            <label>Уровень истощения (1-6):</label>
+                            <input type="number" id="exhaustion-level" 
+                                   value="1" min="1" max="6" 
+                                   class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div id="condition-duration-group">
+                        <div class="form-group">
+                            <label>Длительность (ходов):</label>
+                            <input type="number" id="condition-duration" 
+                                   value="1" min="1" max="100" 
+                                   class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div id="condition-type-group" style="display: none;">
+                        <div class="form-group">
+                            <label>Тип состояния:</label>
+                            <select id="condition-type" class="form-control">
+                                <option value="temporary">Временное</option>
+                                <option value="permanent">Постоянное</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button onclick="addCondition()" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить состояние
+                        </button>
+                        <button onclick="closeModal('condition-modal')" 
+                                class="btn btn-secondary">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="death-saves-modal" class="modal" style="display: none;">
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3><i class="fas fa-heartbeat"></i> Спасброски от смерти</h3>
+                    <button class="close-btn" onclick="closeModal('death-saves-modal')">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Выберите существо:</label>
+                        <select id="death-save-creature-select" class="form-control">
+                            <!-- Заполнится JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div id="death-saves-modal-container">
+                        <!-- Содержимое будет заполнено через renderDeathSaves -->
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="rollAutomaticDeathSave()" class="btn btn-primary">
+                            <i class="fas fa-dice"></i> Автоматический бросок
+                        </button>
+                        <button onclick="rollDeathSave(parseInt(document.getElementById('death-save-creature-select').value))" 
+                                class="btn btn-warning">
+                            <i class="fas fa-dice-d20"></i> Бросить d20
+                        </button>
+                        <button onclick="stabilizeCreature(parseInt(document.getElementById('death-save-creature-select').value))" 
+                                class="btn btn-success">
+                            <i class="fas fa-heart"></i> Стабилизировать
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button onclick="closeModal('death-saves-modal')" 
+                            class="btn btn-secondary">Закрыть</button>
                 </div>
             </div>
         </div>
