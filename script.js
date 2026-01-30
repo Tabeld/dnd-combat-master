@@ -683,7 +683,7 @@ function renderSavedCreatures() {
                         <span style="font-weight: bold; font-size: 1.1rem; margin-left: 5px;">${creature.damage}</span>
                     </div>
                     <span class="damage-type" style="background: ${getDamageTypeColor(creature.damageType)}; padding: 3px 10px; border-radius: 15px; color: white; font-size: 0.8rem;">
-                        ${creature.damageType}
+                        ${translateDamageType(creature.damageType)}
                     </span>
                 </div>
             </div>
@@ -692,7 +692,33 @@ function renderSavedCreatures() {
                 <div style="margin: 10px 0; padding: 8px; background: #e8f4fd; border-radius: var(--radius-sm);">
                     <div><strong>Сопр.:</strong> 
                         ${creature.resistances.map(r =>
-                `<span style="display: inline-block; padding: 2px 8px; background: var(--info); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">${r}</span>`
+                `<span style="display: inline-block; padding: 2px 8px; background: var(--info); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">
+                            ${translateDefense(r)}
+                        </span>`
+            ).join(' ')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${creature.immunities && creature.immunities.length > 0 ? `
+                <div style="margin: 10px 0; padding: 8px; background: #e8f4fd; border-radius: var(--radius-sm);">
+                    <div><strong>Иммунитеты:</strong> 
+                        ${creature.immunities.map(i =>
+                `<span style="display: inline-block; padding: 2px 8px; background: var(--gray); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">
+                            ${translateDefense(i)}
+                        </span>`
+            ).join(' ')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${creature.vulnerabilities && creature.vulnerabilities.length > 0 ? `
+                <div style="margin: 10px 0; padding: 8px; background: #fdeaea; border-radius: var(--radius-sm);">
+                    <div><strong>Уязвимости:</strong> 
+                        ${creature.vulnerabilities.map(v =>
+                `<span style="display: inline-block; padding: 2px 8px; background: var(--danger); color: white; border-radius: 10px; margin: 2px; font-size: 0.8rem;">
+                            ${translateDefense(v)}
+                        </span>`
             ).join(' ')}
                     </div>
                 </div>
@@ -729,6 +755,24 @@ function renderSavedCreatures() {
             </div>
         </div>
     `).join('');
+}
+
+// Функция для перевода защиты (может быть тип урона или состояние)
+function translateDefense(key) {
+    // Сначала пробуем перевести как тип урона
+    const damageTranslation = translateDamageType(key);
+    if (damageTranslation !== key) {
+        return damageTranslation;
+    }
+    
+    // Затем пробуем перевести как состояние
+    const conditionTranslation = translateCondition(key);
+    if (conditionTranslation !== key) {
+        return conditionTranslation;
+    }
+    
+    // Если не нашли перевод, возвращаем оригинал
+    return key;
 }
 
 function getDamageTypeColor(type) {
@@ -4471,23 +4515,23 @@ function viewCreatureDetails(creatureId) {
             <div class="section">
                 <h5><i class="fas fa-shield-alt"></i> Защита от типов урона</h5>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                    ${creature.resistances && creature.resistances.length > 0 ? `
-                        <div>
-                            <strong style="color: var(--info);">Сопротивления:</strong>
-                            <div class="view-damage-types">
-                                ${creature.resistances.map(r =>
-                `<span class="view-damage-mod resistance">${r}</span>`
-            ).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
+                ${creature.resistances && creature.resistances.length > 0 ? `
+                <div>
+                    <strong style="color: var(--info);">Сопротивления:</strong>
+                    <div class="view-damage-types">
+                        ${creature.resistances.map(r =>
+                            `<span class="view-damage-mod resistance">${translateDefense(r)}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            ` : ''}
                     
                     ${creature.immunities && creature.immunities.length > 0 ? `
                         <div>
                             <strong style="color: var(--gray);">Иммунитеты:</strong>
                             <div class="view-damage-types">
                                 ${creature.immunities.map(i =>
-                `<span class="view-damage-mod immunity">${i}</span>`
+                `<span class="view-damage-mod immunity">${translateDefense(r)}</span>`
             ).join('')}
                             </div>
                         </div>
@@ -4498,7 +4542,7 @@ function viewCreatureDetails(creatureId) {
                             <strong style="color: var(--danger);">Уязвимости:</strong>
                             <div class="view-damage-types">
                                 ${creature.vulnerabilities.map(v =>
-                `<span class="view-damage-mod vulnerability">${v}</span>`
+                `<span class="view-damage-mod vulnerability">${translateDefense(r)}</span>`
             ).join('')}
                             </div>
                         </div>
