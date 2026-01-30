@@ -99,7 +99,13 @@ const CONDITIONS = {
         maxDuration: null,
         canBePermanent: true,
         defaultDuration: null,
-        type: 'permanent'
+        type: 'permanent',
+        // НОВОЕ: добавляем защиту от состояний
+        addDefenses: {
+            resistances: ['slashing', 'piercing', 'bludgeoning', 'fire', 'cold', 'acid', 'lightning', 'poison', 'radiant', 'necrotic', 'psychic', 'force', 'thunder'],
+            immunities: ['poison', 'poisoned'],
+            vulnerabilities: []
+        }
     },
     'poisoned': {
         name: 'Отравлен',
@@ -999,6 +1005,11 @@ function createCreatureInstance(template, id) {
         conditionEffects: {}
     };
 
+    // Сохраняем оригинальные защиты
+    instance.originalImmunities = [...(template.immunities || [])];
+    instance.originalResistances = [...(template.resistances || [])];
+    instance.originalVulnerabilities = [...(template.vulnerabilities || [])];
+
     // Убедимся, что есть все необходимые поля
     if (!instance.resistances) instance.resistances = [];
     if (!instance.immunities) instance.immunities = [];
@@ -1007,6 +1018,96 @@ function createCreatureInstance(template, id) {
     if (!instance.lairActions) instance.lairActions = [];
 
     return instance;
+}
+
+// Обновленная функция resetBattle для сброса защит
+function resetBattle() {
+    if (!confirm('Сбросить бой в начальное состояние?\n\nЭто вернет все HP к максимуму, обнулит временные HP, состояния, и сбросит раунды, но сохранит существ в инициативе.')) {
+        return;
+    }
+
+    const creatureResetMap = {};
+    state.creatures.forEach(cr => {
+        creatureResetMap[cr.id] = {
+            maxHP: cr.maxHP,
+            ac: cr.ac,
+            attackBonus: cr.attackBonus,
+            damage: cr.damage,
+            damageType: cr.damageType,
+            resistances: [...(cr.resistances || [])],
+            immunities: [...(cr.immunities || [])],
+            vulnerabilities: [...(cr.vulnerabilities || [])]
+        };
+    });
+
+    state.battle.participants.forEach(participant => {
+        const original = state.creatures.find(c => c.id === participant.id);
+        const resetData = creatureResetMap[participant.id];
+
+        if (resetData) {
+            participant.currentHP = resetData.maxHP;
+            participant.maxHP = resetData.maxHP;
+            participant.originalMaxHP = resetData.maxHP;
+            participant.ac = resetData.ac;
+            participant.attackBonus = resetData.attackBonus;
+            participant.damage = resetData.damage;
+            participant.damageType = resetData.damageType;
+            
+            // Восстанавливаем оригинальные защиты
+            participant.originalImmunities = [...resetData.immunities];
+            participant.originalResistances = [...resetData.resistances];
+            participant.originalVulnerabilities = [...resetData.vulnerabilities];
+            
+            // Обновляем текущие защиты до оригинальных
+            participant.immunities = [...resetData.immunities];
+            participant.resistances = [...resetData.resistances];
+            participant.vulnerabilities = [...resetData.vulnerabilities];
+        } else if (original) {
+            participant.currentHP = original.maxHP;
+            participant.maxHP = original.maxHP;
+            participant.originalMaxHP = original.maxHP;
+        } else {
+            participant.currentHP = participant.maxHP;
+        }
+
+        participant.tempHP = 0;
+        participant.conditions = [];
+        participant.concentration = false;
+        participant.usedLegendaryActions = 0;
+        participant.usedLairActions = false;
+        participant.conditionEffects = {};
+    });
+
+    state.battle.round = 1;
+    state.battle.currentTurn = 0;
+
+    state.battle.log = [];
+    document.getElementById('battle-log').innerHTML = '';
+
+    renderBattle();
+    updateRoundDisplay();
+    saveToLocalStorage();
+
+    addToLog('=== БОЙ СБРОШЕН В НАЧАЛЬНОЕ СОСТОЯНИЕ ===');
+    addToLog('Все HP восстановлены, состояния сброшены');
+}
+
+function clearAllConditions(creatureIndex) {
+    const creature = state.battle.participants[creatureIndex];
+    if (!creature || !creature.conditions || creature.conditions.length === 0) return;
+
+    const conditionNames = creature.conditions.map(c => getConditionName(c.name)).join(', ');
+    creature.conditions = [];
+
+    addToLog(`${creature.name}: все состояния сняты (${conditionNames})`);
+    
+    // Восстанавливаем оригинальные защиты
+    updateCreatureDefensesFromConditions(creature);
+    applyConditionEffects(creature);
+
+    saveToLocalStorage();
+    renderCreatureDetails();
+    renderBattle();
 }
 
 function calculateCurrentAC(creature) {
@@ -2186,9 +2287,19 @@ function renderCreatureDetails() {
                         Сопротивления:
                     </strong>
                     <div style="display: flex; flex-wrap: wrap; gap: 5px;">
-                        ${creature.resistances.map(r =>
-                `<span class="damage-mod resistance" title="${translateDamageType(r)}">${translateDamageType(r)}</span>`
-            ).join('')}
+                    ${creature.resistances.map(r => {
+                        const isFromCondition = creature.conditions.some(c => {
+                            const info = CONDITIONS[c.name];
+                            return info && info.addDefenses && info.addDefenses.resistances && 
+                                   info.addDefenses.resistances.includes(r) &&
+                                   !creature.originalResistances.includes(r);
+                        });
+                        
+                        return `<span class="damage-mod resistance ${isFromCondition ? 'from-condition' : ''}" 
+                                      title="${translateDamageType(r)}${isFromCondition ? ' (от состояния)' : ''}">
+                            ${translateDamageType(r)}
+                        </span>`;
+                    }).join('')}
                     </div>
                 </div>
             `;
@@ -2716,7 +2827,7 @@ function addCondition() {
 
         const existingExhaustion = creature.conditions.find(c => c.name === 'exhaustion');
         if (existingExhaustion) {
-            const newLevel = Math.min(6, level); // Устанавливаем выбранный уровень
+            const newLevel = Math.min(6, level);
             existingExhaustion.level = newLevel;
             addToLog(`${creature.name}: уровень истощения установлен на ${newLevel}`);
         } else {
@@ -2771,6 +2882,9 @@ function addCondition() {
         }
     }
 
+    // Обновляем защиты на основе состояний
+    updateCreatureDefensesFromConditions(creature);
+    
     applyConditionEffects(creature);
     renderBattle();
     closeModal('condition-modal');
@@ -2841,6 +2955,9 @@ function removeCondition(conditionId) {
 
     addToLog(`${creature.name} больше не ${conditionName}`);
 
+    // Обновляем защиты после удаления состояния
+    updateCreatureDefensesFromConditions(creature);
+    
     applyConditionEffects(creature);
 
     saveToLocalStorage();
@@ -3017,6 +3134,7 @@ function applyAutomaticConditions(creature) {
             creature.deathSaves = { successes: 0, failures: 0 };
         }
 
+        updateCreatureDefensesFromConditions(creature);
         applyConditionEffects(creature);
     }
 
@@ -3032,6 +3150,9 @@ function applyAutomaticConditions(creature) {
             creature.dead = false;
 
             addToLog(`${creature.name} пришёл в сознание!`);
+            
+            // Обновляем защиты после удаления состояния бессознательности
+            updateCreatureDefensesFromConditions(creature);
             applyConditionEffects(creature);
         }
     }
@@ -3222,12 +3343,23 @@ function getConditionColor(conditionKey) {
 function decrementConditionDurations(creature) {
     if (!creature.conditions || creature.conditions.length === 0) return;
 
+    let defensesChanged = false;
+    
     creature.conditions.forEach(condition => {
         if (!condition.isPermanent && condition.duration !== null && condition.duration > 0) {
             condition.duration--;
+            
+            // Если состояние закончилось и оно влияло на защиты
+            if (condition.duration === 0) {
+                const conditionInfo = CONDITIONS[condition.name];
+                if (conditionInfo && conditionInfo.addDefenses) {
+                    defensesChanged = true;
+                }
+            }
         }
     });
 
+    // Удаляем состояния с истекшей длительностью
     creature.conditions = creature.conditions.filter(condition => {
         if (condition.isPermanent || condition.duration === null) {
             return true;
@@ -3237,12 +3369,26 @@ function decrementConditionDurations(creature) {
             return true;
         }
 
-        addToLog(`${creature.name}: состояние "${getConditionName(condition.name)}" закончилось`);
+        const conditionName = getConditionName(condition.name);
+        addToLog(`${creature.name}: состояние "${conditionName}" закончилось`);
+        
+        // Проверяем, влияло ли состояние на защиты
+        const conditionInfo = CONDITIONS[condition.name];
+        if (conditionInfo && conditionInfo.addDefenses) {
+            defensesChanged = true;
+        }
+        
         return false;
     });
 
+    // Если какие-то состояния с защитами истекли, обновляем защиты
+    if (defensesChanged) {
+        updateCreatureDefensesFromConditions(creature);
+    }
+
     applyConditionEffects(creature);
 }
+
 
 // ============ УРОН И ЛЕЧЕНИЕ ============
 function applyDamage() {
@@ -3555,6 +3701,10 @@ function toggleConcentration() {
         });
         addToLog(`${creature.name} сконцентрировался`);
     }
+    
+    // Концентрация не влияет на защиты, но обновляем для консистентности
+    updateCreatureDefensesFromConditions(creature);
+    
     if (creature.groupId) {
         updateGroupMemberDisplay(state.currentCreature);
     }
@@ -3562,6 +3712,7 @@ function toggleConcentration() {
     renderCreatureDetails();
     saveToLocalStorage();
 }
+
 
 // ============ БЫСТРЫЙ NPC ============
 function showQuickNPCModal() {
@@ -4789,4 +4940,75 @@ function getDamageTypeColor(type) {
         'thunder': '#0984e3'
     };
     return colors[type] || '#7f8c8d';
+}
+
+// Функция для обновления защиты существа на основе состояний
+function updateCreatureDefensesFromConditions(creature) {
+    if (!creature || !creature.conditions) {
+        return;
+    }
+
+    // Восстанавливаем оригинальные защиты (без эффектов состояний)
+    if (!creature.originalImmunities) {
+        creature.originalImmunities = [...(creature.immunities || [])];
+    }
+    if (!creature.originalResistances) {
+        creature.originalResistances = [...(creature.resistances || [])];
+    }
+    if (!creature.originalVulnerabilities) {
+        creature.originalVulnerabilities = [...(creature.vulnerabilities || [])];
+    }
+
+    // Сбрасываем защиты до оригинальных значений
+    creature.immunities = [...creature.originalImmunities];
+    creature.resistances = [...creature.originalResistances];
+    creature.vulnerabilities = [...creature.originalVulnerabilities];
+
+    // Добавляем защиты от активных состояний
+    creature.conditions.forEach(condition => {
+        const conditionInfo = CONDITIONS[condition.name];
+        if (conditionInfo && conditionInfo.addDefenses) {
+            const defenses = conditionInfo.addDefenses;
+            
+            // Добавляем сопротивления
+            if (defenses.resistances && defenses.resistances.length > 0) {
+                defenses.resistances.forEach(resistance => {
+                    if (!creature.resistances.includes(resistance)) {
+                        creature.resistances.push(resistance);
+                    }
+                });
+            }
+            
+            // Добавляем иммунитеты
+            if (defenses.immunities && defenses.immunities.length > 0) {
+                defenses.immunities.forEach(immunity => {
+                    if (!creature.immunities.includes(immunity)) {
+                        creature.immunities.push(immunity);
+                    }
+                });
+            }
+            
+            // Добавляем уязвимости
+            if (defenses.vulnerabilities && defenses.vulnerabilities.length > 0) {
+                defenses.vulnerabilities.forEach(vulnerability => {
+                    if (!creature.vulnerabilities.includes(vulnerability)) {
+                        creature.vulnerabilities.push(vulnerability);
+                    }
+                });
+            }
+        }
+    });
+
+    // Логируем изменения, если нужно
+    const hasConditionDefenses = creature.conditions.some(c => 
+        CONDITIONS[c.name] && CONDITIONS[c.name].addDefenses
+    );
+    
+    if (hasConditionDefenses) {
+        console.log(`${creature.name}: обновлена защита на основе состояний`, {
+            immunities: creature.immunities,
+            resistances: creature.resistances,
+            vulnerabilities: creature.vulnerabilities
+        });
+    }
 }
