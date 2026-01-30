@@ -246,29 +246,280 @@
 
                                     <!-- Резисты/Иммунитеты/Уязвимости -->
                                     <div class="form-group">
-                                        <label><i class="fas fa-shield-alt"></i>
-                                            Сопротивления (через
-                                            запятую):</label>
-                                        <input type="text" id="cr-resistances"
-                                            placeholder="огонь, холод"
-                                            class="form-control">
+                                        <label><i class="fas fa-shield-alt"></i> Сопротивления:</label>
+                                        <div id="cr-resistances-container" class="checkbox-container">
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="slashing" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="piercing" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="bludgeoning" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="fire" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="cold" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="acid" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="lightning" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="poison" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="radiant" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="necrotic" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="psychic" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="force" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="thunder" class="damage-checkbox">
+                                                    <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label><i class="fas fa-ban"></i>
-                                            Иммунитеты (через запятую):</label>
-                                        <input type="text" id="cr-immunities"
-                                            placeholder="яд, оглушение"
-                                            class="form-control">
+                                        <label><i class="fas fa-ban"></i> Иммунитеты:</label>
+                                        <div id="cr-immunities-container" class="checkbox-container">
+                                            <!-- Типы урона -->
+                                            <div class="checkbox-section">
+                                                <div class="checkbox-subtitle">Типы урона:</div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="slashing" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="piercing" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="bludgeoning" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="fire" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="cold" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="acid" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="lightning" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="poison" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="radiant" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="necrotic" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="psychic" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="force" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="thunder" class="immunity-checkbox">
+                                                        <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Состояния -->
+                                            <div class="checkbox-section" style="margin-top: 15px;">
+                                                <div class="checkbox-subtitle">Состояния:</div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="blinded" class="immunity-checkbox">
+                                                        <span class="condition-badge">Ослепление</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="charmed" class="immunity-checkbox">
+                                                        <span class="condition-badge">Очарование</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="frightened" class="immunity-checkbox">
+                                                        <span class="condition-badge">Испуг</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="grappled" class="immunity-checkbox">
+                                                        <span class="condition-badge">Схваченность</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="paralyzed" class="immunity-checkbox">
+                                                        <span class="condition-badge">Паралич</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="petrified" class="immunity-checkbox">
+                                                        <span class="condition-badge">Окаменение</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="poisoned" class="immunity-checkbox">
+                                                        <span class="condition-badge">Отравление</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="prone" class="immunity-checkbox">
+                                                        <span class="condition-badge">Сбит с ног</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="restrained" class="immunity-checkbox">
+                                                        <span class="condition-badge">Ограничение</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="stunned" class="immunity-checkbox">
+                                                        <span class="condition-badge">Оглушение</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="unconscious" class="immunity-checkbox">
+                                                        <span class="condition-badge">Бессознательность</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="invisible" class="immunity-checkbox">
+                                                        <span class="condition-badge">Невидимость</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox-row">
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="deafened" class="immunity-checkbox">
+                                                        <span class="condition-badge">Глухота</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="exhaustion" class="immunity-checkbox">
+                                                        <span class="condition-badge">Истощение</span>
+                                                    </label>
+                                                    <label class="checkbox-label">
+                                                        <input type="checkbox" value="incapacitated" class="immunity-checkbox">
+                                                        <span class="condition-badge">Недееспособность</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label><i
-                                                class="fas fa-skull-crossbones"></i>
-                                            Уязвимости (через запятую):</label>
-                                        <input type="text"
-                                            id="cr-vulnerabilities"
-                                            placeholder="силовой"
-                                            class="form-control">
+                                        <label><i class="fas fa-skull-crossbones"></i> Уязвимости:</label>
+                                        <div id="cr-vulnerabilities-container" class="checkbox-container">
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="slashing" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="piercing" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="bludgeoning" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="fire" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="cold" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="acid" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="lightning" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="poison" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="radiant" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="necrotic" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="psychic" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                                                </label>
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="force" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                                                </label>
+                                            </div>
+                                            <div class="checkbox-row">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" value="thunder" class="vulnerability-checkbox">
+                                                    <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
+
 
                                     <!-- Мультиатака -->
                                     <div class="form-group">
@@ -950,19 +1201,278 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Резисты (через запятую):</label>
-                    <input type="text" id="edit-resistances"
-                        class="form-control">
+                    <label>Сопротивление:</label>
+                    <div id="edit-resistances-container" class="checkbox-container">
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="slashing" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="piercing" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="bludgeoning" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="fire" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="cold" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="acid" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="lightning" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="poison" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="radiant" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="necrotic" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="psychic" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="force" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="thunder" class="damage-checkbox">
+                                <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="form-group">
-                    <label>Иммунитеты (через запятую):</label>
-                    <input type="text" id="edit-immunities"
-                        class="form-control">
+                    <label>Иммунитеты:</label>
+                    <div id="edit-immunities-container" class="checkbox-container">
+                        <!-- Типы урона -->
+                        <div class="checkbox-section">
+                            <div class="checkbox-subtitle">Типы урона:</div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="slashing" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="piercing" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="bludgeoning" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="fire" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="cold" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="acid" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="lightning" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="poison" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="radiant" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="necrotic" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="psychic" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="force" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="thunder" class="immunity-checkbox">
+                                    <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Состояния -->
+                        <div class="checkbox-section" style="margin-top: 15px;">
+                            <div class="checkbox-subtitle">Состояния:</div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="blinded" class="immunity-checkbox">
+                                    <span class="condition-badge">Ослепление</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="charmed" class="immunity-checkbox">
+                                    <span class="condition-badge">Очарование</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="frightened" class="immunity-checkbox">
+                                    <span class="condition-badge">Испуг</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="grappled" class="immunity-checkbox">
+                                    <span class="condition-badge">Схваченность</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="paralyzed" class="immunity-checkbox">
+                                    <span class="condition-badge">Паралич</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="petrified" class="immunity-checkbox">
+                                    <span class="condition-badge">Окаменение</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="poisoned" class="immunity-checkbox">
+                                    <span class="condition-badge">Отравление</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="prone" class="immunity-checkbox">
+                                    <span class="condition-badge">Сбит с ног</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="restrained" class="immunity-checkbox">
+                                    <span class="condition-badge">Ограничение</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="stunned" class="immunity-checkbox">
+                                    <span class="condition-badge">Оглушение</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="unconscious" class="immunity-checkbox">
+                                    <span class="condition-badge">Бессознательность</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="invisible" class="immunity-checkbox">
+                                    <span class="condition-badge">Невидимость</span>
+                                </label>
+                            </div>
+                            <div class="checkbox-row">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="deafened" class="immunity-checkbox">
+                                    <span class="condition-badge">Глухота</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="exhaustion" class="immunity-checkbox">
+                                    <span class="condition-badge">Истощение</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" value="incapacitated" class="immunity-checkbox">
+                                    <span class="condition-badge">Недееспособность</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="form-group">
-                    <label>Уязвимости (через запятую):</label>
-                    <input type="text" id="edit-vulnerabilities"
-                        class="form-control">
+                    <label>Уязвимости:</label>
+                    <div id="edit-vulnerabilities-container" class="checkbox-container">
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="slashing" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #e74c3c;">Рубящий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="piercing" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #3498db;">Колющий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="bludgeoning" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #8e44ad;">Дробящий</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="fire" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #f39c12;">Огонь</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="cold" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #1abc9c;">Холод</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="acid" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #2ecc71;">Кислота</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="lightning" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #f1c40f;">Электричество</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="poison" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #9b59b6;">Яд</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="radiant" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #f1c40f;">Свет</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="necrotic" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #2c3e50;">Некротический</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="psychic" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #e84393;">Психический</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="force" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #6c5ce7;">Силовой</span>
+                            </label>
+                        </div>
+                        <div class="checkbox-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" value="thunder" class="vulnerability-checkbox">
+                                <span class="damage-type-badge" style="background: #0984e3;">Звук</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Мультиатака:</label>

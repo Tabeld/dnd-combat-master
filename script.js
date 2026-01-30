@@ -421,6 +421,11 @@ function saveCreature() {
         return;
     }
 
+    // Получаем выбранные значения из чекбоксов
+    const resistances = getCheckedValues('#cr-resistances-container', 'damage-checkbox');
+    const immunities = getCheckedValues('#cr-immunities-container', 'immunity-checkbox');
+    const vulnerabilities = getCheckedValues('#cr-vulnerabilities-container', 'vulnerability-checkbox');
+
     const creatureData = {
         name: name,
         maxHP: parseInt(document.getElementById('cr-max-hp').value) || 10,
@@ -429,9 +434,9 @@ function saveCreature() {
         attackBonus: parseInt(document.getElementById('cr-attack-bonus').value) || 0,
         damage: document.getElementById('cr-damage').value.trim() || '1d6',
         damageType: document.getElementById('cr-damage-type').value,
-        resistances: parseDamageTypes(document.getElementById('cr-resistances').value),
-        immunities: parseDamageTypes(document.getElementById('cr-immunities').value),
-        vulnerabilities: parseDamageTypes(document.getElementById('cr-vulnerabilities').value),
+        resistances: resistances,
+        immunities: immunities,
+        vulnerabilities: vulnerabilities,
         multiattack: document.getElementById('cr-multiattack').value.trim(),
         legendaryActions: parseActions(document.getElementById('cr-legendary-actions').value),
         lairActions: parseActions(document.getElementById('cr-lair-actions').value),
@@ -466,12 +471,6 @@ function editCreature(creatureId) {
     const creature = state.creatures.find(c => c.id === creatureId);
     if (!creature) return;
 
-    // Закрываем модальное окно просмотра, если оно открыто
-    const viewModal = document.getElementById('view-creature-modal');
-    if (viewModal && viewModal.style.display === 'flex') {
-        closeModal('view-creature-modal');
-    }
-
     document.getElementById('cr-id').value = creature.id;
     document.getElementById('cr-name').value = creature.name;
     document.getElementById('cr-max-hp').value = creature.maxHP;
@@ -480,9 +479,9 @@ function editCreature(creatureId) {
     document.getElementById('cr-attack-bonus').value = creature.attackBonus;
     document.getElementById('cr-damage').value = creature.damage;
     document.getElementById('cr-damage-type').value = creature.damageType;
-    document.getElementById('cr-resistances').value = creature.resistances ? creature.resistances.join(', ') : '';
-    document.getElementById('cr-immunities').value = creature.immunities ? creature.immunities.join(', ') : '';
-    document.getElementById('cr-vulnerabilities').value = creature.vulnerabilities ? creature.vulnerabilities.join(', ') : '';
+    setCheckedValues('#cr-resistances-container', 'damage-checkbox', creature.resistances);
+    setCheckedValues('#cr-immunities-container', 'immunity-checkbox', creature.immunities);
+    setCheckedValues('#cr-vulnerabilities-container', 'vulnerability-checkbox', creature.vulnerabilities);
     document.getElementById('cr-multiattack').value = creature.multiattack || '';
     document.getElementById('cr-legendary-actions').value = creature.legendaryActions ? creature.legendaryActions.join('|') : '';
     document.getElementById('cr-lair-actions').value = creature.lairActions ? creature.lairActions.join('|') : '';
@@ -518,9 +517,9 @@ function resetCreatureForm() {
     document.getElementById('cr-attack-bonus').value = '10';
     document.getElementById('cr-damage').value = '2d6+3';
     document.getElementById('cr-damage-type').value = 'slashing';
-    document.getElementById('cr-resistances').value = '';
-    document.getElementById('cr-immunities').value = '';
-    document.getElementById('cr-vulnerabilities').value = '';
+    resetCheckboxes('#cr-resistances-container', 'damage-checkbox');
+    resetCheckboxes('#cr-immunities-container', 'immunity-checkbox');
+    resetCheckboxes('#cr-vulnerabilities-container', 'vulnerability-checkbox');
     document.getElementById('cr-multiattack').value = '';
     document.getElementById('cr-legendary-actions').value = '';
     document.getElementById('cr-lair-actions').value = '';
@@ -538,16 +537,72 @@ function resetCreatureForm() {
     document.getElementById('edit-controls').style.display = 'none';
 }
 
-function parseDamageTypes(input) {
-    return input.split(',')
-        .map(t => t.trim().toLowerCase())
-        .filter(t => t.length > 0);
-}
-
 function parseActions(input) {
     return input.split('|')
         .map(a => a.trim())
         .filter(a => a.length > 0);
+}
+
+// Вспомогательные функции для работы с чекбоксами
+function getCheckedValues(containerSelector, checkboxClass) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return [];
+    
+    const checkboxes = container.querySelectorAll(`input[type="checkbox"].${checkboxClass}`);
+    const values = [];
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            values.push(checkbox.value);
+        }
+    });
+    
+    return values;
+}
+
+function setCheckedValues(containerSelector, checkboxClass, values) {
+    const container = document.querySelector(containerSelector);
+    if (!container || !values) return;
+    
+    const checkboxes = container.querySelectorAll(`input[type="checkbox"].${checkboxClass}`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = values.includes(checkbox.value);
+    });
+}
+
+function resetCheckboxes(containerSelector, checkboxClass) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    
+    const checkboxes = container.querySelectorAll(`input[type="checkbox"].${checkboxClass}`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+
+// Функции для быстрого выбора всех/снятия всех чекбоксов
+function selectAllCheckboxes(containerSelector, checkboxClass) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    
+    const checkboxes = container.querySelectorAll(`input[type="checkbox"].${checkboxClass}`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+function deselectAllCheckboxes(containerSelector, checkboxClass) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    
+    const checkboxes = container.querySelectorAll(`input[type="checkbox"].${checkboxClass}`);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
 }
 
 function renderSavedCreatures() {
@@ -1767,8 +1822,48 @@ function renderCreatureDetails() {
         return;
     }
 
-    const isGroupMember = creature.groupId &&
-        state.battle.participants.filter(p => p.groupId === creature.groupId).length > 1;
+    // Словари для перевода на русский
+    const damageTypeTranslation = {
+        'slashing': 'Рубящий',
+        'piercing': 'Колющий', 
+        'bludgeoning': 'Дробящий',
+        'fire': 'Огонь',
+        'cold': 'Холод',
+        'acid': 'Кислота',
+        'lightning': 'Электричество',
+        'poison': 'Яд',
+        'radiant': 'Свет',
+        'necrotic': 'Некротический',
+        'psychic': 'Психический',
+        'force': 'Силовой',
+        'thunder': 'Звук'
+    };
+
+    const conditionTranslation = {
+        'blinded': 'Ослепление',
+        'charmed': 'Очарование',
+        'frightened': 'Испуг',
+        'grappled': 'Схваченность',
+        'paralyzed': 'Паралич',
+        'petrified': 'Окаменение',
+        'poisoned': 'Отравление',
+        'prone': 'Сбит с ног',
+        'restrained': 'Ограничение',
+        'stunned': 'Оглушение',
+        'unconscious': 'Бессознательность',
+        'invisible': 'Невидимость',
+        'deafened': 'Глухота',
+        'exhaustion': 'Истощение',
+        'incapacitated': 'Недееспособность'
+    };
+
+    // Функции для перевода
+    const translateDamageType = (type) => damageTypeTranslation[type] || type;
+    const translateCondition = (condition) => conditionTranslation[condition] || condition;
+
+    // Разделяем иммунитеты на типы урона и состояния
+    const damageImmunities = creature.immunities.filter(immunity => damageTypeTranslation[immunity]);
+    const conditionImmunities = creature.immunities.filter(immunity => conditionTranslation[immunity]);
 
     let html = `
         <div class="stat-block">
@@ -1778,7 +1873,7 @@ function renderCreatureDetails() {
                     ${creature.name}
                     ${creature.groupNumber ? `<span class="group-number" style="margin-left: 10px;">${creature.groupNumber}</span>` : ''}
                 </h4>
-                ${isGroupMember ? `<small>(Группа: ${creature.baseName})</small>` : ''}
+                ${creature.groupId ? `<small>(Группа: ${creature.baseName})</small>` : ''}
             </div>
             
             <div class="creature-stats-detailed">
@@ -1919,7 +2014,6 @@ function renderCreatureDetails() {
         </div>
     `;
 
-
     if (creature.conditions.length > 0) {
         html += `
             <div class="section">
@@ -2042,9 +2136,9 @@ function renderCreatureDetails() {
                         `).join('')}
                     </div>
                     <button onclick="resetLegendaryActionsForCreature(${state.currentCreature})" 
-                                class="btn btn-sm btn-warning">
-                            <i class="fas fa-redo"></i> Сбросить
-                        </button>
+                            class="btn btn-sm btn-warning">
+                        <i class="fas fa-redo"></i> Сбросить
+                    </button>
                 </div>
                 
                 <div style="margin-top: 10px;">
@@ -2066,7 +2160,7 @@ function renderCreatureDetails() {
             <h5><i class="fas fa-bolt"></i> Атака</h5>
             <div>
                 <strong>Урон:</strong> ${creature.damage} 
-                <span class="damage-type">${creature.damageType}</span>
+                <span class="damage-type">${translateDamageType(creature.damageType)}</span>
             </div>
             ${creature.multiattack ? `
                 <div style="margin-top: 10px;">
@@ -2076,29 +2170,76 @@ function renderCreatureDetails() {
         </div>
     `;
 
+    // Обновленная секция защиты с четким разделением
     if (creature.resistances.length > 0 || creature.immunities.length > 0 || creature.vulnerabilities.length > 0) {
         html += `
             <div class="section">
                 <h5><i class="fas fa-shield-alt"></i> Защита</h5>
-                <div class="damage-modifiers">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
         `;
 
+        // Сопротивления
         if (creature.resistances.length > 0) {
-            html += creature.resistances.map(r =>
-                `<span class="damage-mod resistance">${r}</span>`
-            ).join('');
+            html += `
+                <div>
+                    <strong style="color: var(--info); display: block; margin-bottom: 3px; font-size: 0.9em;">
+                        Сопротивления:
+                    </strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        ${creature.resistances.map(r =>
+                `<span class="damage-mod resistance" title="${translateDamageType(r)}">${translateDamageType(r)}</span>`
+            ).join('')}
+                    </div>
+                </div>
+            `;
         }
 
-        if (creature.immunities.length > 0) {
-            html += creature.immunities.map(i =>
-                `<span class="damage-mod immunity">${i}</span>`
-            ).join('');
+        // Иммунитеты (типы урона)
+        if (damageImmunities.length > 0) {
+            html += `
+                <div>
+                    <strong style="color: var(--gray); display: block; margin-bottom: 3px; font-size: 0.9em;">
+                        Иммунитеты (типы урона):
+                    </strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        ${damageImmunities.map(i =>
+                `<span class="damage-mod immunity" title="${translateDamageType(i)}">${translateDamageType(i)}</span>`
+            ).join('')}
+                    </div>
+                </div>
+            `;
         }
 
+        // Иммунитеты (состояния)
+        if (conditionImmunities.length > 0) {
+            html += `
+                <div>
+                    <strong style="color: var(--gray); display: block; margin-bottom: 3px; font-size: 0.9em;">
+                        Иммунитеты (состояния):
+                    </strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        ${conditionImmunities.map(c =>
+                `<span class="damage-mod immunity" title="${translateCondition(c)}">${translateCondition(c)}</span>`
+            ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Уязвимости
         if (creature.vulnerabilities.length > 0) {
-            html += creature.vulnerabilities.map(v =>
-                `<span class="damage-mod vulnerability">${v}</span>`
-            ).join('');
+            html += `
+                <div>
+                    <strong style="color: var(--danger); display: block; margin-bottom: 3px; font-size: 0.9em;">
+                        Уязвимости:
+                    </strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                        ${creature.vulnerabilities.map(v =>
+                `<span class="damage-mod vulnerability" title="${translateDamageType(v)}">${translateDamageType(v)}</span>`
+            ).join('')}
+                    </div>
+                </div>
+            `;
         }
 
         html += `
@@ -2144,7 +2285,7 @@ function renderCreatureDetails() {
         </div>
     `;
 
-    if (isGroupMember) {
+    if (creature.groupId) {
         html += `
             <div class="section">
                 <h5><i class="fas fa-users"></i> Управление группой</h5>
@@ -2485,9 +2626,10 @@ function showEditCreatureModal(index) {
     document.getElementById('edit-attack-bonus').value = creature.attackBonus;
     document.getElementById('edit-damage').value = creature.damage;
     document.getElementById('edit-damage-type').value = creature.damageType;
-    document.getElementById('edit-resistances').value = creature.resistances ? creature.resistances.join(', ') : '';
-    document.getElementById('edit-immunities').value = creature.immunities ? creature.immunities.join(', ') : '';
-    document.getElementById('edit-vulnerabilities').value = creature.vulnerabilities ? creature.vulnerabilities.join(', ') : '';
+    setCheckedValues('#edit-resistances-container', 'damage-checkbox', creature.resistances);
+    setCheckedValues('#edit-immunities-container', 'immunity-checkbox', creature.immunities);
+    setCheckedValues('#edit-vulnerabilities-container', 'vulnerability-checkbox', creature.vulnerabilities);
+
     document.getElementById('edit-multiattack').value = creature.multiattack || '';
     document.getElementById('edit-legendary-actions').value = creature.legendaryActions ? creature.legendaryActions.join('|') : '';
     document.getElementById('edit-lair-actions').value = creature.lairActions ? creature.lairActions.join('|') : '';
@@ -2516,9 +2658,12 @@ function saveCreatureEdit() {
     creature.attackBonus = parseInt(document.getElementById('edit-attack-bonus').value) || creature.attackBonus;
     creature.damage = document.getElementById('edit-damage').value.trim() || creature.damage;
     creature.damageType = document.getElementById('edit-damage-type').value;
-    creature.resistances = parseDamageTypes(document.getElementById('edit-resistances').value);
-    creature.immunities = parseDamageTypes(document.getElementById('edit-immunities').value);
-    creature.vulnerabilities = parseDamageTypes(document.getElementById('edit-vulnerabilities').value);
+
+    // Получаем значения из чекбоксов
+    creature.resistances = getCheckedValues('#edit-resistances-container', 'damage-checkbox');
+    creature.immunities = getCheckedValues('#edit-immunities-container', 'immunity-checkbox');
+    creature.vulnerabilities = getCheckedValues('#edit-vulnerabilities-container', 'vulnerability-checkbox');
+
     creature.multiattack = document.getElementById('edit-multiattack').value.trim();
     creature.legendaryActions = parseActions(document.getElementById('edit-legendary-actions').value);
     creature.lairActions = parseActions(document.getElementById('edit-lair-actions').value);
@@ -4602,4 +4747,67 @@ function rollAutomaticDeathSave() {
     // Обновляем отображение в модальном окне
     document.getElementById('death-saves-modal-container').innerHTML =
         renderDeathSaves(creature, creatureIndex);
+}
+
+// Глобальные словари для перевода
+const damageTypeTranslation = {
+    'slashing': 'Рубящий',
+    'piercing': 'Колющий', 
+    'bludgeoning': 'Дробящий',
+    'fire': 'Огонь',
+    'cold': 'Холод',
+    'acid': 'Кислота',
+    'lightning': 'Электричество',
+    'poison': 'Яд',
+    'radiant': 'Свет',
+    'necrotic': 'Некротический',
+    'psychic': 'Психический',
+    'force': 'Силовой',
+    'thunder': 'Звук'
+};
+
+const conditionTranslation = {
+    'blinded': 'Ослепление',
+    'charmed': 'Очарование',
+    'frightened': 'Испуг',
+    'grappled': 'Схваченность',
+    'paralyzed': 'Паралич',
+    'petrified': 'Окаменение',
+    'poisoned': 'Отравление',
+    'prone': 'Сбит с ног',
+    'restrained': 'Ограничение',
+    'stunned': 'Оглушение',
+    'unconscious': 'Бессознательность',
+    'invisible': 'Невидимость',
+    'deafened': 'Глухота',
+    'exhaustion': 'Истощение',
+    'incapacitated': 'Недееспособность'
+};
+
+// Вспомогательные функции для перевода
+function translateDamageType(type) {
+    return damageTypeTranslation[type] || type;
+}
+
+function translateCondition(condition) {
+    return conditionTranslation[condition] || condition;
+}
+
+function getDamageTypeColor(type) {
+    const colors = {
+        'slashing': '#e74c3c',
+        'piercing': '#3498db',
+        'bludgeoning': '#8e44ad',
+        'fire': '#f39c12',
+        'cold': '#1abc9c',
+        'acid': '#2ecc71',
+        'lightning': '#f1c40f',
+        'poison': '#9b59b6',
+        'radiant': '#f1c40f',
+        'necrotic': '#2c3e50',
+        'psychic': '#e84393',
+        'force': '#6c5ce7',
+        'thunder': '#0984e3'
+    };
+    return colors[type] || '#7f8c8d';
 }

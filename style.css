@@ -139,7 +139,7 @@ header p {
     gap: 20px;
     padding: 20px;
     flex: 1;
-    overflow-y: auto; 
+    overflow-y: auto;
     position: relative;
 }
 
@@ -148,7 +148,8 @@ header p {
     grid-row: 1;
     display: flex;
     flex-direction: column;
-    max-height: calc(70vh - 100px); /* Ограничение высоты */
+    max-height: calc(70vh - 100px);
+    /* Ограничение высоты */
     min-height: 700px;
     overflow: hidden;
 }
@@ -168,7 +169,8 @@ header p {
     grid-column: 2;
     grid-row: 1;
     display: flex;
-    max-height: calc(70vh - 100px); /* Ограничение высоты */
+    max-height: calc(70vh - 100px);
+    /* Ограничение высоты */
     min-height: 700px;
     flex-direction: column;
     overflow: hidden;
@@ -255,9 +257,9 @@ header p {
 }
 
 .quick-actions .btn {
-    padding: 6px 10px; 
-    font-size: 0.85rem; 
-    min-width: 80px; 
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    min-width: 80px;
 }
 
 .action-tabs {
@@ -307,37 +309,38 @@ header p {
     display: flex;
     gap: 10px;
 }
+
 .initiative-controls .btn {
-    padding: 4px 8px; 
+    padding: 4px 8px;
     font-size: 0.8rem;
-    height: auto; 
+    height: auto;
     min-height: 30px;
 }
 
 .quick-actions .btn {
-    padding: 4px 8px; 
-    font-size: 0.8rem; 
+    padding: 4px 8px;
+    font-size: 0.8rem;
     min-width: 70px;
-    height: auto; 
-    min-height: 30px; 
+    height: auto;
+    min-height: 30px;
 }
 
 .turn-indicator {
-    padding: 4px 10px; 
+    padding: 4px 10px;
     font-size: 0.85rem;
 }
 
 .round-info h2 {
-    font-size: 0.9rem; 
+    font-size: 0.9rem;
 }
 
 .round-number {
-    padding: 2px 8px; 
-    font-size: 0.8rem; 
+    padding: 2px 8px;
+    font-size: 0.8rem;
 }
 
 .battle-header {
-    padding: 6px 12px; 
+    padding: 6px 12px;
     gap: 5px;
 }
 
@@ -1320,7 +1323,7 @@ label {
 
 .condition-badge:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .condition-badge.blinded {
@@ -1637,80 +1640,190 @@ label {
 }
 
 .death-save-circle {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1.1rem;
-        transition: all 0.2s ease;
-    }
-    
-    .death-save-circle.success {
-        border: 2px solid #2ecc71;
-        color: #2ecc71;
-    }
-    
-    .death-save-circle.success.filled {
-        background-color: #2ecc71;
-        color: white;
-    }
-    
-    .death-save-circle.failure {
-        border: 2px solid #e74c3c;
-        color: #e74c3c;
-    }
-    
-    .death-save-circle.failure.filled {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    .death-saves-result {
-        text-align: center;
-        padding: 8px;
-        border-radius: var(--radius-sm);
-        font-weight: bold;
-        margin: 10px 0;
-    }
-    
-    .death-saves-result.dead {
-        background-color: #fadbd8;
-        color: #c0392b;
-        border: 1px solid #e74c3c;
-    }
-    
-    .death-saves-result.stabilized {
-        background-color: #d5f4e6;
-        color: #27ae60;
-        border: 1px solid #2ecc71;
-    }
-    
-    .death-saves-mini {
-        display: flex;
-        gap: 5px;
-        margin-top: 5px;
-        font-size: 0.8rem;
-    }
-    
-    .death-save-mini {
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-weight: bold;
-    }
-    
-    .death-save-mini.success {
-        background-color: rgba(46, 204, 113, 0.2);
-        color: #27ae60;
-    }
-    
-    .death-save-mini.failure {
-        background-color: rgba(231, 76, 60, 0.2);
-        color: #c0392b;
-    }
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+}
+
+.death-save-circle.success {
+    border: 2px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.death-save-circle.success.filled {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.death-save-circle.failure {
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.death-save-circle.failure.filled {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.death-saves-result {
+    text-align: center;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.death-saves-result.dead {
+    background-color: #fadbd8;
+    color: #c0392b;
+    border: 1px solid #e74c3c;
+}
+
+.death-saves-result.stabilized {
+    background-color: #d5f4e6;
+    color: #27ae60;
+    border: 1px solid #2ecc71;
+}
+
+.death-saves-mini {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    font-size: 0.8rem;
+}
+
+.death-save-mini {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.death-save-mini.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #27ae60;
+}
+
+.death-save-mini.failure {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+}
+
+
+
+/* Стили для контейнеров с чекбоксами */
+.checkbox-container {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e0e0e0;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.checkbox-section {
+    margin-bottom: 8px;
+}
+
+.checkbox-section:last-child {
+    margin-bottom: 0;
+}
+
+.checkbox-subtitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.85em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 3px;
+}
+
+.checkbox-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 5px;
+}
+
+.checkbox-row:last-child {
+    margin-bottom: 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+    user-select: none;
+    font-size: 0.85em;
+}
+
+.checkbox-label:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 5px;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+}
+
+/* Уменьшенные бейджи для чекбоксов */
+.damage-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.75em;
+    font-weight: 500;
+    min-width: 60px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.condition-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.75em;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: center;
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для выбранных чекбоксов */
+.checkbox-label input[type="checkbox"]:checked + .damage-type-badge,
+.checkbox-label input[type="checkbox"]:checked + .condition-badge {
+    box-shadow: 0 0 0 2px #3498db, 0 2px 6px rgba(52, 152, 219, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Быстрые действия для чекбоксов */
+.checkbox-quick-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.checkbox-quick-actions button {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
 
 .temp-ac-badge {
     display: inline-block;
@@ -1753,17 +1866,17 @@ label {
     header {
         padding: 6px 12px;
     }
-    
+
     header h1 {
         font-size: 1.4rem;
         gap: 10px;
     }
-    
+
     .tabs {
         font-size: 0.85rem;
         flex-wrap: wrap;
     }
-    
+
     .tab {
         padding: 7px 4px;
         font-size: 0.9rem;
@@ -1771,7 +1884,7 @@ label {
         flex: none;
         width: 25%;
     }
-    
+
     .tab-content {
         overflow-y: auto;
     }
@@ -1786,43 +1899,43 @@ label {
         height: auto;
         min-height: 0;
     }
-    
+
     .initiative-section {
         grid-column: 1;
         grid-row: 1;
         max-height: 400px;
     }
-    
+
     .creature-section {
         grid-column: 1;
         grid-row: 2;
         max-height: 400px;
     }
-    
+
     .log-section {
         grid-column: 1;
         grid-row: 3;
         height: 250px;
         min-height: 250px;
     }
-    
+
     .battle-header {
         flex-direction: column;
         gap: 15px;
         padding: 12px;
     }
-    
+
     .round-info {
         flex-wrap: wrap;
         gap: 10px;
         justify-content: center;
     }
-    
+
     .current-turn {
         align-items: center;
         width: 100%;
     }
-    
+
     .quick-actions {
         justify-content: center;
         flex-wrap: wrap;
@@ -1836,17 +1949,17 @@ label {
         height: auto;
         gap: 15px;
     }
-    
+
     #bestiary .card:last-child {
         min-height: 400px;
         max-height: 600px;
     }
-    
+
     #saved-creatures {
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 12px;
     }
-    
+
     #saved-creatures .stat-block {
         min-width: 280px;
         max-width: 100%;
@@ -1859,21 +1972,21 @@ label {
     body {
         padding: 5px;
     }
-    
+
     .container {
         height: calc(100vh - 10px);
     }
-    
+
     header {
         padding: 10px;
     }
-    
+
     header h1 {
         font-size: 1.5rem;
         flex-direction: column;
         gap: 5px;
     }
-    
+
     .tabs {
         overflow-x: auto;
         white-space: nowrap;
@@ -1881,55 +1994,55 @@ label {
         justify-content: flex-start;
         padding: 0 5px;
     }
-    
+
     .tab {
         width: auto;
         min-width: 120px;
         padding: 10px 15px;
         font-size: 0.85rem;
     }
-    
+
     .battle-content {
         padding: 10px;
         gap: 10px;
     }
-    
+
     .card-header {
         padding: 10px 12px;
     }
-    
+
     .card-header h3 {
         font-size: 1rem;
     }
-    
+
     .card-content {
         padding: 10px;
     }
-    
+
     .initiative-controls {
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .creature-stats-detailed {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
-    
+
     .action-buttons {
         grid-template-columns: 1fr;
     }
-    
+
     .btn {
         padding: 10px 12px;
         font-size: 0.9rem;
     }
-    
+
     .group-management {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .group-select {
         width: 100%;
     }
@@ -1942,46 +2055,46 @@ label {
         padding: 8px 10px;
         font-size: 0.8rem;
     }
-    
+
     .initiative-item {
         flex-direction: column;
         align-items: flex-start;
         padding: 10px;
     }
-    
+
     .initiative-score {
         margin-bottom: 8px;
         align-self: flex-start;
     }
-    
+
     .creature-stats {
         flex-direction: column;
         gap: 5px;
     }
-    
+
     .hp-control {
         flex-direction: column;
         align-items: stretch;
     }
-    
+
     .hp-input-small {
         width: 100%;
     }
-    
+
     .modal-content {
         width: 95%;
         padding: 15px;
     }
-    
+
     .form-row {
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .dice-roller {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     #saved-creatures {
         grid-template-columns: 1fr;
     }
@@ -2037,12 +2150,13 @@ label {
 
 /* Фикс для мобильных устройств */
 @media (hover: none) and (pointer: coarse) {
+
     .btn:hover,
     .tab:hover,
     .initiative-item:hover {
         transform: none;
     }
-    
+
     .dice-btn:hover {
         transform: none;
         box-shadow: var(--shadow);
@@ -2054,16 +2168,16 @@ label {
     .creature-name {
         font-size: 0.95rem;
     }
-    
+
     .log-entry {
         font-size: 0.85rem;
         padding: 6px;
     }
-    
+
     .section h5 {
         font-size: 0.95rem;
     }
-    
+
     .damage-mod {
         padding: 4px 8px;
         font-size: 0.8rem;
@@ -2076,7 +2190,7 @@ label {
         max-height: none;
         overflow: visible;
     }
-    
+
     #bestiary .card-content {
         max-height: none;
     }
@@ -2088,23 +2202,23 @@ label {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr auto;
     }
-    
+
     .initiative-section {
         grid-column: 1;
         grid-row: 1;
     }
-    
+
     .creature-section {
         grid-column: 2;
         grid-row: 1;
     }
-    
+
     .log-section {
         grid-column: 1 / span 2;
         grid-row: 2;
         height: 200px;
     }
-    
+
     #bestiary .other-tab-content .grid {
         grid-template-columns: 1fr 1fr;
     }
