@@ -3407,15 +3407,27 @@ function applyDamage() {
         let damageDealt = 0;
 
         if (type !== 'healing') {
+            // Проверяем иммунитеты
             if (creature.immunities && creature.immunities.includes(type)) {
                 damageAmount = 0;
                 addToLog(`${creature.name} иммунен к ${type} урону`);
-            } else if (creature.resistances && creature.resistances.includes(type)) {
-                damageAmount = Math.floor(damageAmount / 2);
-                addToLog(`${creature.name} имеет сопротивление к ${type} (половина урона)`);
-            } else if (creature.vulnerabilities && creature.vulnerabilities.includes(type)) {
-                damageAmount = damageAmount * 2;
-                addToLog(`${creature.name} уязвим к ${type} (двойной урон)`);
+            } else {
+                // Проверяем наличие и сопротивления, и уязвимости одновременно
+                const hasResistance = creature.resistances && creature.resistances.includes(type);
+                const hasVulnerability = creature.vulnerabilities && creature.vulnerabilities.includes(type);
+                
+                // Если есть и сопротивление, и уязвимость - они аннулируют друг друга
+                if (hasResistance && hasVulnerability) {
+                    addToLog(`${creature.name} имеет и сопротивление, и уязвимость к ${type} - эффекты аннулируются`);
+                } else if (hasResistance) {
+                    // Только сопротивление
+                    damageAmount = Math.floor(damageAmount / 2);
+                    addToLog(`${creature.name} имеет сопротивление к ${type} (половина урона)`);
+                } else if (hasVulnerability) {
+                    // Только уязвимость
+                    damageAmount = damageAmount * 2;
+                    addToLog(`${creature.name} уязвим к ${type} (двойной урон)`);
+                }
             }
         }
 
