@@ -2446,27 +2446,6 @@ function applyTempHP() {
     saveToLocalStorage();
 }
 
-function addTempHP(amount, action = 'add') {
-    const creature = state.battle.participants[state.currentCreature];
-    if (!creature) return;
-
-    if (action === 'add') {
-        creature.tempHP += amount;
-        addToLog(`${creature.name} получил ${amount} временных HP`);
-    } else if (action === 'set') {
-        creature.tempHP = Math.max(creature.tempHP, amount);
-        if (amount > creature.tempHP) {
-            addToLog(`${creature.name} получил ${amount} временных HP (заменил старые)`);
-        }
-    }
-    if (creature.groupId) {
-        updateGroupMemberDisplay(state.currentCreature);
-    }
-    renderBattle();
-    renderCreatureDetails();
-    saveToLocalStorage();
-}
-
 function clearTempHP() {
     const creature = state.battle.participants[state.currentCreature];
     if (!creature) return;
