@@ -5068,3 +5068,351 @@ function updateCreatureDefensesFromConditions(creature) {
         });
     }
 }
+
+
+// ============ ФУНКЦИИ ДЛЯ РАЗДЕЛЬНОГО УПРАВЛЕНИЯ ДАННЫМИ ============
+
+// Сохранить только бой
+function saveBattle() {
+    const battleData = {
+        battle: state.battle,
+        groups: state.groups,
+        timestamp: new Date().toISOString(),
+        type: 'battle_only'
+    };
+
+    const dataStr = JSON.stringify(battleData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportLink = document.createElement('a');
+    exportLink.setAttribute('href', dataUri);
+    exportLink.setAttribute('download', `dnd_battle_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(exportLink);
+    exportLink.click();
+    document.body.removeChild(exportLink);
+
+    addToLog('Состояние боя экспортировано в файл');
+}
+
+// Загрузить только бой
+function loadBattle() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+            try {
+                const loadedData = JSON.parse(reader.result);
+
+                // Проверяем тип файла
+                if (!loadedData.battle) {
+                    alert('Файл не содержит данных о бое!');
+                    return;
+                }
+
+                if (!confirm('Загрузить состояние боя?\n\nТекущий бой будет заменен.')) {
+                    return;
+                }
+
+                // Загружаем данные боя
+                state.battle = loadedData.battle;
+                if (loadedData.groups) {
+                    state.groups = loadedData.groups;
+                }
+
+                saveToLocalStorage();
+                renderBattle();
+                updateContextCreatures();
+
+                // Применяем эффекты состояний ко всем существам после загрузки
+                state.battle.participants.forEach(creature => {
+                    applyConditionEffects(creature);
+                });
+
+                addToLog(`Состояние боя загружено из файла: ${file.name}`);
+            } catch (err) {
+                alert('Ошибка загрузки файла: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
+// Сохранить только бестиарий
+function saveBestiary() {
+    const bestiaryData = {
+        creatures: state.creatures,
+        timestamp: new Date().toISOString(),
+        type: 'bestiary_only',
+        count: state.creatures.length
+    };
+
+    const dataStr = JSON.stringify(bestiaryData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportLink = document.createElement('a');
+    exportLink.setAttribute('href', dataUri);
+    exportLink.setAttribute('download', `dnd_bestiary_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(exportLink);
+    exportLink.click();
+    document.body.removeChild(exportLink);
+
+    addToLog(`Бестиарий экспортирован в файл (${state.creatures.length} существ)`);
+}
+
+// Загрузить только бестиарий
+function loadBestiary() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+            try {
+                const loadedData = JSON.parse(reader.result);
+
+                // Проверяем тип файла
+                if (!loadedData.creatures || !Array.isArray(loadedData.creatures)) {
+                    alert('Файл не содержит данных бестиария!');
+                    return;
+                }
+
+                const action = prompt(
+                    `Файл содержит ${loadedData.creatures.length} существ.\n\n` +
+                    'Выберите действие:\n' +
+                    '1. ЗАМЕНИТЬ - заменить текущий бестиарий\n' +
+                    '2. ДОБАВИТЬ - добавить к текущему бестиарию\n' +
+                    '3. ОТМЕНА - отменить загрузку\n\n' +
+                    'Введите 1, 2 или 3:'
+                );
+
+                if (!action || (action !== '1' && action !== '2')) {
+                    return;
+                }
+
+                if (action === '1') {
+                    // Заменить бестиарий
+                    if (!confirm(`Заменить текущий бестиарий (${state.creatures.length} существ) на новый (${loadedData.creatures.length} существ)?`)) {
+                        return;
+                    }
+                    state.creatures = loadedData.creatures;
+                    addToLog(`Бестиарий заменён. Загружено ${loadedData.creatures.length} существ`);
+                } else if (action === '2') {
+                    // Добавить к существующему
+                    const originalCount = state.creatures.length;
+                    
+                    // Проверяем дубликаты по имени
+                    let addedCount = 0;
+                    let skippedCount = 0;
+                    
+                    loadedData.creatures.forEach(newCreature => {
+                        const exists = state.creatures.some(existingCreature => 
+                            existingCreature.name.toLowerCase() === newCreature.name.toLowerCase()
+                        );
+                        
+                        if (!exists) {
+                            // Добавляем новое существо с новым ID
+                            state.creatures.push({
+                                ...newCreature,
+                                id: Date.now() + Math.random() // Новый уникальный ID
+                            });
+                            addedCount++;
+                        } else {
+                            skippedCount++;
+                        }
+                    });
+                    
+                    addToLog(`Добавлено ${addedCount} новых существ. Пропущено ${skippedCount} дубликатов. Всего в бестиарии: ${state.creatures.length} существ`);
+                }
+
+                saveToLocalStorage();
+                renderSavedCreatures();
+                addToLog(`Бестиарий обновлён из файла: ${file.name}`);
+            } catch (err) {
+                alert('Ошибка загрузки файла: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
+// Очистить только бой
+function clearBattleOnly() {
+    if (!confirm('Очистить только бой?\n\nЭто удалит всех участников боя, сбросит раунды и историю, но сохранит бестиарий.')) {
+        return;
+    }
+
+    state.battle = {
+        participants: [],
+        currentTurn: 0,
+        round: 1,
+        log: [],
+        groups: {},
+        history: [],
+        historyIndex: -1
+    };
+    state.currentCreature = null;
+
+    saveToLocalStorage();
+    renderBattle();
+    updateContextCreatures();
+
+    addToLog('=== БОЙ ОЧИЩЕН ===');
+    addToLog('Все участники боя удалены, состояние сброшено');
+}
+
+// Очистить только бестиарий
+function clearBestiary() {
+    if (state.creatures.length === 0) {
+        alert('Бестиарий уже пуст!');
+        return;
+    }
+
+    if (!confirm(`Очистить бестиарий?\n\nЭто удалит ${state.creatures.length} сохранённых существ. Действие необратимо.`)) {
+        return;
+    }
+
+    // Сначала сохраняем резервную копию на всякий случай
+    const backup = JSON.stringify(state.creatures);
+    localStorage.setItem('bestiary_backup_' + Date.now(), backup);
+
+    state.creatures = [];
+    saveToLocalStorage();
+    renderSavedCreatures();
+
+    addToLog('=== БЕСТИАРИЙ ОЧИЩЕН ===');
+    addToLog(`Удалено ${state.creatures.length} существ`);
+    alert('Бестиарий очищен. Резервная копия сохранена в localStorage.');
+}
+
+// Обновленная функция для сохранения всей сессии
+function saveSession() {
+    const sessionData = {
+        creatures: state.creatures,
+        battle: state.battle,
+        groups: state.groups,
+        timestamp: new Date().toISOString(),
+        type: 'full_session',
+        stats: {
+            creatures_count: state.creatures.length,
+            battle_participants: state.battle.participants.length,
+            battle_round: state.battle.round
+        }
+    };
+
+    const dataStr = JSON.stringify(sessionData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const exportLink = document.createElement('a');
+    exportLink.setAttribute('href', dataUri);
+    exportLink.setAttribute('download', `dnd_full_session_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(exportLink);
+    exportLink.click();
+    document.body.removeChild(exportLink);
+
+    addToLog('Полная сессия экспортирована в файл');
+}
+
+// Обновленная функция для загрузки всей сессии
+function loadSession() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function () {
+            try {
+                const loadedData = JSON.parse(reader.result);
+
+                if (!confirm('Загрузить полную сессию?\n\nТекущие данные будут заменены.')) {
+                    return;
+                }
+
+                // Загружаем все данные
+                if (loadedData.creatures) {
+                    state.creatures = loadedData.creatures;
+                }
+
+                if (loadedData.battle) {
+                    state.battle = loadedData.battle;
+                }
+
+                if (loadedData.groups) {
+                    state.groups = loadedData.groups;
+                }
+
+                saveToLocalStorage();
+                renderSavedCreatures();
+                renderBattle();
+                updateContextCreatures();
+
+                // Применяем эффекты состояний ко всем существам после загрузки
+                state.battle.participants.forEach(creature => {
+                    applyConditionEffects(creature);
+                });
+
+                addToLog(`Полная сессия загружена из файла: ${file.name}`);
+            } catch (err) {
+                alert('Ошибка загрузки файла: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
+// Функция для восстановления бестиария из резервной копии
+function restoreBestiaryBackup() {
+    // Ищем последнюю резервную копию
+    const backupKeys = Object.keys(localStorage).filter(key => key.startsWith('bestiary_backup_'));
+    
+    if (backupKeys.length === 0) {
+        alert('Резервные копии не найдены!');
+        return;
+    }
+    
+    // Сортируем по времени (последняя резервная копия)
+    backupKeys.sort((a, b) => {
+        const timeA = parseInt(a.split('_')[2]);
+        const timeB = parseInt(b.split('_')[2]);
+        return timeB - timeA;
+    });
+    
+    const lastBackupKey = backupKeys[0];
+    const backupData = localStorage.getItem(lastBackupKey);
+    
+    if (!backupData) {
+        alert('Резервная копия повреждена!');
+        return;
+    }
+    
+    try {
+        const backupCreatures = JSON.parse(backupData);
+        const backupTime = new Date(parseInt(lastBackupKey.split('_')[2]));
+        
+        if (confirm(`Восстановить бестиарий из резервной копии от ${backupTime.toLocaleString()}?\n\nВ копии ${backupCreatures.length} существ. Текущий бестиарий будет заменён.`)) {
+            state.creatures = backupCreatures;
+            saveToLocalStorage();
+            renderSavedCreatures();
+            addToLog(`Бестиарий восстановлен из резервной копии (${backupCreatures.length} существ)`);
+            alert('Бестиарий восстановлен!');
+        }
+    } catch (err) {
+        alert('Ошибка восстановления из резервной копии: ' + err.message);
+    }
+}

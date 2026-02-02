@@ -743,35 +743,24 @@
             <!-- Управление сессией -->
             <div id="session" class="tab-content">
                 <div class="other-tab-content">
-                    <div class="grid"
-                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
                         <div class="card">
                             <div class="card-header">
-                                <h3><i class="fas fa-database"></i> Управление
-                                    данными</h3>
+                                <h3><i class="fas fa-database"></i> Управление данными</h3>
                             </div>
                             <div class="card-content">
-                                <div
-                                    style="display: flex; flex-direction: column; gap: 10px;">
-                                    <button onclick="loadSession()"
-                                        class="btn btn-primary">
-                                        <i class="fas fa-download"></i> Загрузка
-                                        сессии
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button onclick="loadSession()" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Загрузить полную сессию
                                     </button>
-                                    <button onclick="saveSession()"
-                                        class="btn btn-success">
-                                        <i class="fas fa-upload"></i> Сохранение
-                                        сессии
+                                    <button onclick="saveSession()" class="btn btn-success">
+                                        <i class="fas fa-upload"></i> Сохранить полную сессию
                                     </button>
-                                    <button onclick="backupData()"
-                                        class="btn btn-warning">
-                                        <i class="fas fa-file-export"></i>
-                                        Резервная копия
+                                    <button onclick="backupData()" class="btn btn-warning">
+                                        <i class="fas fa-file-export"></i> Резервная копия в localStorage
                                     </button>
-                                    <button onclick="clearSession()"
-                                        class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Очистить
-                                        всё
+                                    <button onclick="clearSession()" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Очистить всё
                                     </button>
                                 </div>
                             </div>
@@ -779,8 +768,45 @@
 
                         <div class="card">
                             <div class="card-header">
-                                <h3><i class="fas fa-chart-bar"></i> Статистика
-                                    боя</h3>
+                                <h3><i class="fas fa-swords"></i> Управление боем</h3>
+                            </div>
+                            <div class="card-content">
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button onclick="loadBattle()" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Загрузить только бой
+                                    </button>
+                                    <button onclick="saveBattle()" class="btn btn-success">
+                                        <i class="fas fa-upload"></i> Сохранить только бой
+                                    </button>
+                                    <button onclick="clearBattleOnly()" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Очистить только бой
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-book"></i> Управление бестиарием</h3>
+                            </div>
+                            <div class="card-content">
+                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                    <button onclick="loadBestiary()" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Загрузить только бестиарий
+                                    </button>
+                                    <button onclick="saveBestiary()" class="btn btn-success">
+                                        <i class="fas fa-upload"></i> Сохранить только бестиарий
+                                    </button>
+                                    <button onclick="clearBestiary()" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Очистить только бестиарий
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-bar"></i> Статистика боя</h3>
                             </div>
                             <div class="card-content">
                                 <div id="battle-stats"></div>
@@ -789,7 +815,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
         <!-- Модальные окна -->
         <div id="damage-modal" class="modal">
